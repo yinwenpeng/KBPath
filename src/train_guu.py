@@ -4,7 +4,7 @@ import os
 import sys
 sys.setrecursionlimit(6000)
 import time
-
+from word2embeddings.nn.util import zero_value, random_value_normal
 import numpy as np
 import theano
 import theano.tensor as T
@@ -17,14 +17,14 @@ from random import shuffle
 from preprocess import rel_idmatrix_to_word2vec_init, rel_idlist_to_word2vec_init
 from preprocess_socher_guu import load_guu_data, load_all_triples_inIDs, neg_entity_tensor
 from common_functions import create_conv_para, cosine_tensor3_tensor4, cosine_tensors, GRU_Batch_Tensor_Input_with_Mask_with_MatrixInit, Conv_with_input_para, LSTM_Batch_Tensor_Input_with_Mask, create_ensemble_para, L2norm_paraList, Diversify_Reg, create_GRU_para, GRU_Batch_Tensor_Input_with_Mask, create_LSTM_para, load_word2vec
-def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0.001, rel_emb_size=300, margin=0.5, ent_emb_size=300, batch_size=50, filter_size=3, maxSentLen=5, neg_size=100):
+def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0.001, rel_emb_size=300, margin=0.5, ent_emb_size=300, batch_size=50, maxSentLen=5, neg_size=20):
     model_options = locals().copy()
     print "model options", model_options
 
     rng = np.random.RandomState(1234)    #random seed, control the model generates the same results
 
     corpus,rel_id2wordlist,ent_str2id, relation_str2id, tuple2tailset  =load_guu_data(maxPathLen=maxSentLen)  #minlen, include one label, at least one word in the sentence
-    # tuple2tailset=load_all_triples_inIDs(ent_str2id, relation_str2id)
+#     tuple2tailset=load_all_triples_inIDs(ent_str2id, relation_str2id, tuple2tailset)
     train_set=corpus[0]
     train_paths_store=train_set[0]
     train_masks_store=train_set[1]
@@ -45,10 +45,12 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0
 
     rel_vocab_size=  len(relation_str2id)+1 # add one zero pad index
     ent_vocab_size=len(ent_str2id)
-    rel_rand_values=rng.normal(0.0, 0.01, (rel_vocab_size, rel_emb_size))   #generate a matrix by Gaussian distribution
+#     rel_rand_values=rng.normal(0.0, 0.01, (rel_vocab_size, rel_emb_size))   #generate a matrix by Gaussian distribution
+    rel_rand_values=random_value_normal((rel_vocab_size, rel_emb_size), theano.config.floatX, np.random.RandomState(1234))
     rel_embeddings=theano.shared(value=np.array(rel_rand_values,dtype=theano.config.floatX), borrow=True)
 
-    ent_rand_values=rng.normal(0.0, 0.01, (ent_vocab_size, ent_emb_size))   #generate a matrix by Gaussian distribution
+#     ent_rand_values=rng.normal(0.0, 0.01, (ent_vocab_size, ent_emb_size))   #generate a matrix by Gaussian distribution
+    ent_rand_values=random_value_normal((ent_vocab_size, ent_emb_size), theano.config.floatX, np.random.RandomState(1234))
     ent_embeddings=theano.shared(value=np.array(ent_rand_values,dtype=theano.config.floatX), borrow=True)
 
     word2vec=load_word2vec()
@@ -86,7 +88,11 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0
     simi_grounds=cosine_tensors(pred_ent_embs, ground_truth_entities) #(batch, len)
     simi_negs=cosine_tensor3_tensor4(pred_ent_embs, neg_entities) #(#neg, batch, len)
     raw_loss=T.maximum(0.0, margin+simi_negs-simi_grounds)
-    loss=T.mean(raw_loss*path_mask.dimshuffle('x', 0,1))
+#     loss=T.sum(raw_loss*path_mask.dimshuffle('x', 0,1))
+    valid_indice_list=T.repeat(path_mask.dimshuffle('x', 0,1), neg_size, axis=0).flatten().nonzero()[0]
+    loss=T.sum(raw_loss.flatten()[valid_indice_list])
+    
+    
 
     #loss for testing
     dot_prod=T.dot(pred_last_ents, vocab_inputs) #(batch, hidden) * (hidden, vocab_size) == (batch, vocab_size)
@@ -164,7 +170,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0
             cost_i+= train_model(
                                  ent_idmatrix[:,0],
                                     np.asarray(rel_idmatrix, dtype='int32'),
-                                      np.asarray(rel_idmatrix_to_word2vec_init(rel_idmatrix, rel_id2wordlist, word2vec, rel_emb_size), dtype=theano.config.floatX),
+                                      np.asarray(rel_idmatrix_to_word2vec_init(rel_idmatrix, rel_id2wordlist, word2vec, 300), dtype=theano.config.floatX),
                                       np.asarray([train_masks_store[id] for id in batch_indices],dtype=theano.config.floatX),
                                       ent_idmatrix[:,1:],
                                       neg_entity_tensor(ent_idmatrix, rel_idmatrix, tuple2tailset, neg_size, ent_vocab_set))
@@ -187,7 +193,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0
                     cosine_batch_vocab=test_model(
                                        test_ent_idmatrix[:,0],
                                     np.asarray(test_rel_idmatrix, dtype='int32'),
-                                      np.asarray(rel_idmatrix_to_word2vec_init(test_rel_idmatrix, rel_id2wordlist, word2vec, rel_emb_size), dtype=theano.config.floatX),
+                                      np.asarray(rel_idmatrix_to_word2vec_init(test_rel_idmatrix, rel_id2wordlist, word2vec, 300), dtype=theano.config.floatX),
                                       test_masks_matrix)
 
                     sort_id_matrix=np.argsort(cosine_batch_vocab, axis=1)

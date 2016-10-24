@@ -76,45 +76,44 @@ def recover_entities_for_guu_paths():
         writefile.close()
         print '\t\t\t\t ..........over'
 
-def load_all_triples_inIDs(ent_str2id, relation_str2id):
+def load_all_triples_inIDs(ent_str2id, relation_str2id, tuple2tailset):
     rootpath=    '/mounts/data/proj/wenpeng/Dataset/FB_socher/length_1/'
     files=['train.txt', 'dev.txt', 'test.txt']
 #     triple2id={}
-    tuple2tailset={}
+#     tuple2tailset={}
+    
     for file_id, file in enumerate(files):
         readfile=open(rootpath+file, 'r')
+        add_sum=0
         for line in readfile:
             parts=line.strip().split()
             length=len(parts)
             if length ==3 or (length ==4 and parts[3]=='1'):
                 head_id=ent_str2id.get(parts[0])
                 rel_id=relation_str2id.get(parts[1])
-                r_rel_id=relation_str2id.get('**'+parts[1])
+                r_rel_id=relation_str2id.get('_'+parts[1])
                 tail_id=ent_str2id.get(parts[2])
-                if head_id is None or rel_id is None or tail_id is None:
-                    print 'this triple can not converted into ids:', line
-                    exit(0)
+                
+                if head_id is not None and rel_id is not None and tail_id is not None:
+                    tuple=(head_id, rel_id)
+                    exist_tailset=tuple2tailset.get(tuple)
+                    if exist_tailset is not None and tail_id not in exist_tailset:
+                        exist_tailset.add(tail_id)
+                        tuple2tailset[tuple]=exist_tailset
+                        add_sum+=1
+                   
+#                 if tail_id is not None and r_rel_id is not None and head_id is not None:
+#                     tuple=(tail_id, r_rel_id)
+#                     exist_tailset=tuple2tailset.get(tuple)
+#                     if exist_tailset is not None and head_id not in exist_tailset:
+#                         exist_tailset.add(head_id)
+#                         tuple2tailset[tuple]=exist_tailset
+#                         add_sum+=1
 
-                tuple=(head_id, rel_id)
-                tail=tail_id
-                r_tuple=(tail_id, r_rel_id)
-                r_tail=head_id
-#                 triple=(parts[0], parts[1], parts[2])
-                exist_tailset=tuple2tailset.get(tuple)
-                if exist_tailset is  None:
-                    exist_tailset=set()
-                exist_tailset.add(tail)
-                tuple2tailset[tuple]=exist_tailset
-
-                r_exist_tailset=tuple2tailset.get(r_tuple)
-                if r_exist_tailset is  None:
-                    r_exist_tailset=set()
-                r_exist_tailset.add(r_tail)
-                tuple2tailset[r_tuple]=r_exist_tailset
 
 
         readfile.close()
-        print rootpath+file, '... load over, size', len(tuple2tailset)
+        print rootpath+file, '... load over, size', len(tuple2tailset), 'add tuple2tailset size:', add_sum
     return tuple2tailset
 
 def load_all_triples():
@@ -180,6 +179,8 @@ def add_tuple2tailset(ent_path, one_path, tuple2tailset):
 def load_guu_data(maxPathLen=20):
     rootPath='/mounts/data/proj/wenpeng/Dataset/FB_socher/path/'
     files=['train_ent_recovered.txt', 'test_ent_recovered.txt']
+#     rootPath='/mounts/data/proj/wenpeng/Dataset/FB_socher/length_1/'
+#     files=['/mounts/data/proj/wenpeng/Dataset/FB_socher/length_1/train.txt', '/mounts/data/proj/wenpeng/Dataset/FB_socher/path/train_ent_recovered.txt', '/mounts/data/proj/wenpeng/Dataset/FB_socher/path/test_ent_recovered.txt']
     relation_str2id={}
     relation_id2wordlist={}
     ent_str2id={}
@@ -249,7 +250,7 @@ def load_guu_data(maxPathLen=20):
                     ent_path=ent_path[:1]+ent_path[-maxPathLen:]
                     one_mask=[1.0]*maxPathLen
 
-                if file_id == 0:
+                if file_id < 1:
                     if len(ent_path)!=maxPathLen+1 or len(one_path) != maxPathLen:
                         print 'len(ent_path)!=5:',len(ent_path), len(one_path)
                         print 'line:', line
