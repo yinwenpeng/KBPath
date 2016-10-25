@@ -1413,7 +1413,7 @@ def normalize_matrix(M):
     norm=T.sqrt(T.sum(T.sqr(M)))
     return M/norm
 def L2norm_paraList(params):
-    return T.mean([T.mean(x ** 2) for x in params])
+    return T.sum([T.mean(x ** 2) for x in params])
 
 # def L2norm_paraList(paralist):
 #     summ=0.0
@@ -1642,4 +1642,13 @@ def store_model_to_file(file_path, best_params):
     save_file = open(file_path, 'wb')  # this will overwrite current contents
     for para in best_params:
         cPickle.dump(para.get_value(borrow=True), save_file, -1)  # the -1 is for HIGHEST_PROTOCOL
+    save_file.close()
+def load_model_from_file(file_path, params):
+    #save_file = open('/mounts/data/proj/wenpeng/Dataset/WikiQACorpus/Best_Conv_Para')
+    save_file = open(file_path)
+#     save_file = open('/mounts/data/proj/wenpeng/Dataset/WikiQACorpus/Best_Conv_Para_at_22')
+    
+    for para in params:
+        para.set_value(cPickle.load(save_file), borrow=True)
+    print 'model loaded successfully'
     save_file.close()

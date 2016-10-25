@@ -174,7 +174,23 @@ def add_tuple2tailset(ent_path, one_path, tuple2tailset):
         if tail not in tailset:
             tailset.add(tail)
             tuple2tailset[tuple]=tailset
-
+def add_ent2relset(ent_path, one_path, ent2relset, maxSetSize):
+    size=len(one_path)
+    if len(ent_path)!=size+1:
+        print 'len(ent_path)!=len(one_path)+1:', len(ent_path),size
+        exit(0)
+    for i in range(size):
+        ent_id=ent_path[i+1]
+        rel_id=one_path[i]
+        relset=ent2relset.get(ent_id)
+        if relset is None:
+            relset=set()
+        if rel_id not in relset:
+            relset.add(rel_id)
+            if len(relset) > maxSetSize:
+                maxSetSize=len(relset)
+            ent2relset[ent_id]=relset 
+    return maxSetSize   
 
 def load_guu_data(maxPathLen=20):
     rootPath='/mounts/data/proj/wenpeng/Dataset/FB_socher/path/'
@@ -273,7 +289,106 @@ def load_guu_data(maxPathLen=20):
 
     return ((train_paths_store, train_masks_store, train_ents_store),
             (test_paths_store, test_masks_store, test_ents_store)) , relation_id2wordlist,ent_str2id, relation_str2id, tuple2tailset
+def load_guu_data_v2(maxPathLen=20):
+    rootPath='/mounts/data/proj/wenpeng/Dataset/FB_socher/path/'
+    files=['train_ent_recovered.txt', 'test_ent_recovered.txt']
+#     rootPath='/mounts/data/proj/wenpeng/Dataset/FB_socher/length_1/'
+#     files=['/mounts/data/proj/wenpeng/Dataset/FB_socher/length_1/train.txt', '/mounts/data/proj/wenpeng/Dataset/FB_socher/path/train_ent_recovered.txt', '/mounts/data/proj/wenpeng/Dataset/FB_socher/path/test_ent_recovered.txt']
+    relation_str2id={}
+    relation_id2wordlist={}
+    ent_str2id={}
+    tuple2tailset={}
+    train_paths_store=[]
+    train_ents_store=[]
+    ent2relset={}
+    ent2relset_maxSetSize=0
 
+    train_masks_store=[]
+
+
+#     dev_paths_store=[]
+#     dev_targets_store=[]
+#     dev_masks_store=[]
+#     dev_heads_store=[]
+
+    test_paths_store=[]
+    test_ents_store=[]
+    test_masks_store=[]
+
+    max_path_len=0
+    for file_id, fil in enumerate(files):
+
+            filename=rootPath+fil
+            print 'loading', filename, '...'
+            readfile=open(filename, 'r')
+            line_co=0
+            for line in readfile:
+
+                parts=line.strip().split('\t')
+                ent_list=[]
+                rel_list=[]
+                for i in range(len(parts)):
+                    if i%2==0:
+                        ent_list.append(parts[i])
+                    else:
+                        rel_list.append(parts[i].replace('**', '_'))
+                if len(ent_list)!=len(rel_list)+1:
+                    print 'len(ent_list)!=len(rel_list)+1:', len(ent_list),len(rel_list)
+                    print 'line:', line
+                    exit(0)
+                ent_path=keylist_2_valuelist(ent_list, ent_str2id, 0)
+                one_path=[]
+                for potential_relation in rel_list:
+
+                    rel_id=relation_str2id.get(potential_relation)
+                    if rel_id is None:
+                        rel_id=len(relation_str2id)+1
+                        relation_str2id[potential_relation]=rel_id
+                    wordlist=potential_relation.split('_')
+#                                 wordIdList=strs2ids(potential_relation.split(), word2id)
+                    relation_id2wordlist[rel_id]=wordlist
+                    one_path.append(rel_id)
+                add_tuple2tailset(ent_path, one_path, tuple2tailset)
+                ent2relset_maxSetSize=add_ent2relset(ent_path, one_path, ent2relset, ent2relset_maxSetSize)
+
+                #pad
+                valid_size=len(one_path)
+                if valid_size > max_path_len:
+                    max_path_len=valid_size
+                pad_size=maxPathLen-valid_size
+                if pad_size > 0:
+                    one_path=[0]*pad_size+one_path
+                    # ent_path=ent_path[:pad_size]+ent_path
+                    ent_path=ent_path[:1]+ent_path[1:2]*pad_size+ent_path[1:]
+                    one_mask=[0.0]*pad_size+[1.0]*valid_size
+                else:
+                    one_path=one_path[-maxPathLen:]  # select the last max_len relations
+                    ent_path=ent_path[:1]+ent_path[-maxPathLen:]
+                    one_mask=[1.0]*maxPathLen
+
+                if file_id < 1:
+                    if len(ent_path)!=maxPathLen+1 or len(one_path) != maxPathLen:
+                        print 'len(ent_path)!=5:',len(ent_path), len(one_path)
+                        print 'line:', line
+                        exit(0)
+                    train_paths_store.append(one_path)
+                    train_ents_store.append(ent_path)
+                    train_masks_store.append(one_mask)
+                else:
+                    test_paths_store.append(one_path)
+                    test_ents_store.append(ent_path)
+                    test_masks_store.append(one_mask)
+
+                # line_co+=1
+                # if line_co==10000:#==0:
+                #     #  print line_co
+                #     break
+
+            readfile.close()
+            print '\t\t\t\tload over, overall ',    len(train_paths_store), ' train,', len(test_paths_store), ' test,', 'tuple2tailset size:', len(tuple2tailset),', max path len:', max_path_len, 'max ent2relsetSize:', ent2relset_maxSetSize
+
+    return ((train_paths_store, train_masks_store, train_ents_store),
+            (test_paths_store, test_masks_store, test_ents_store)) , relation_id2wordlist,ent_str2id, relation_str2id, tuple2tailset, ent2relset, ent2relset_maxSetSize
 def neg_entity_tensor(ent_idmatrix, rel_idmatrix, pair2tailset, neg_size, ent_vocab_set):
     batch_size=len(ent_idmatrix)
     length=len(rel_idmatrix[0])
