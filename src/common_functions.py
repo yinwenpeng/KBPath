@@ -8,6 +8,7 @@ from logistic_sgd import LogisticRegression
 import numpy as np
 from scipy.spatial.distance import cosine
 import string
+import cPickle
 
 def create_AttentionMatrix_para(rng, n_in, n_out):
 
@@ -1545,3 +1546,100 @@ def cosine_tensor3_tensor4(tensor3, tensor4):
     norm_3=T.sqrt(T.sum(tensor3**2, axis=1)) #(batch, len)
     norm_4=T.sqrt(T.sum(tensor4**2, axis=2)) #(#neg, batch, len)
     return dot_prod/(norm_3.dimshuffle('x', 0,1)*norm_4)#(#neg, batch, len)
+
+def Adam(cost, params, lr=0.0002, b1=0.1, b2=0.001, e=1e-8):
+    updates = []
+    grads = T.grad(cost, params)
+    i = theano.shared(numpy.float32(0.))
+    i_t = i + 1.
+    fix1 = 1. - (1. - b1)**i_t
+    fix2 = 1. - (1. - b2)**i_t
+    lr_t = lr * (T.sqrt(fix2) / fix1)
+    for p, g in zip(params, grads):
+        m = theano.shared(p.get_value() * 0.)
+        v = theano.shared(p.get_value() * 0.)
+        m_t = (b1 * g) + ((1. - b1) * m)
+        v_t = (b2 * T.sqr(g)) + ((1. - b2) * v)
+        g_t = m_t / (T.sqrt(v_t) + e)
+        p_t = p - (lr_t * g_t)
+        updates.append((m, m_t))
+        updates.append((v, v_t))
+        updates.append((p, p_t))
+    updates.append((i, i_t))
+    return updates
+
+class rmsprop(object):
+    """
+    RMSProp with nesterov momentum and gradient rescaling
+    """
+    def __init__(self, params):
+        self.running_square_ = [theano.shared(np.zeros_like(p.get_value(), dtype=theano.config.floatX))
+                                for p in params]
+        self.running_avg_ = [theano.shared(np.zeros_like(p.get_value(), dtype=theano.config.floatX))
+                             for p in params]
+        self.memory_ = [theano.shared(np.zeros_like(p.get_value(), dtype=theano.config.floatX))
+                        for p in params]
+
+    def updates(self, params, grads, learning_rate, momentum, rescale=5.):
+        grad_norm = T.sqrt(sum(map(lambda x: T.sqr(x).sum(), grads)))
+        not_finite = T.or_(T.isnan(grad_norm), T.isinf(grad_norm))
+        grad_norm = T.sqrt(grad_norm)
+        scaling_num = rescale
+        scaling_den = T.maximum(rescale, grad_norm)
+        # Magic constants
+        combination_coeff = 0.95
+        minimum_grad = 1e-4
+        updates = []
+        for n, (param, grad) in enumerate(zip(params, grads)):
+            grad = T.switch(not_finite, 0.1 * param,
+                            grad * (scaling_num / scaling_den))
+            old_square = self.running_square_[n]
+            new_square = combination_coeff * old_square + (
+                1. - combination_coeff) * T.sqr(grad)
+#             print 'new_square.type:', new_square.type
+            old_avg = self.running_avg_[n]
+            new_avg = combination_coeff * old_avg + (
+                1. - combination_coeff) * grad
+#             print 'new_avg.type:', new_avg.type
+            rms_grad = T.sqrt(new_square - new_avg ** 2)
+#             print 'rms_grad_0.type', rms_grad.type
+            rms_grad = T.maximum(rms_grad, minimum_grad)
+#             print 'rms_grad.type', rms_grad.type
+            memory = self.memory_[n]
+            half1=momentum * memory
+#             print 'half1.type', half1.type
+#             print 'grad.type', grad.type
+            half2=learning_rate * grad / rms_grad
+#             print 'half2.type', half2.type
+            update = half1 - half2
+#             print 'update.type', update.type
+            update2 = momentum * momentum * memory - (np.float32(1.0) + momentum) * learning_rate * grad / rms_grad
+#             print 'update2.type:', update2.type
+            updates.append((old_square, new_square))
+            updates.append((old_avg, new_avg))
+            updates.append((memory, update))
+            updates.append((param, param + update2))
+        return updates
+
+
+class sgd_nesterov(object):
+    def __init__(self, params):
+        self.memory_ = [theano.shared(np.zeros_like(p.get_value()))
+                        for p in params]
+
+    def updates(self, params, grads, learning_rate, momentum):
+        updates = []
+        for n, (param, grad) in enumerate(zip(params, grads)):
+            memory = self.memory_[n]
+            update = momentum * memory - learning_rate * grad
+            update2 = momentum * momentum * memory - (
+                1 + momentum) * learning_rate * grad
+            updates.append((memory, update))
+            updates.append((param, param + update2))
+        return updates
+
+def store_model_to_file(file_path, best_params):
+    save_file = open(file_path, 'wb')  # this will overwrite current contents
+    for para in best_params:
+        cPickle.dump(para.get_value(borrow=True), save_file, -1)  # the -1 is for HIGHEST_PROTOCOL
+    save_file.close()

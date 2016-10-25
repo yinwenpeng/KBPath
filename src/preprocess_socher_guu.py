@@ -81,7 +81,7 @@ def load_all_triples_inIDs(ent_str2id, relation_str2id, tuple2tailset):
     files=['train.txt', 'dev.txt', 'test.txt']
 #     triple2id={}
 #     tuple2tailset={}
-    
+
     for file_id, file in enumerate(files):
         readfile=open(rootpath+file, 'r')
         add_sum=0
@@ -93,7 +93,7 @@ def load_all_triples_inIDs(ent_str2id, relation_str2id, tuple2tailset):
                 rel_id=relation_str2id.get(parts[1])
                 r_rel_id=relation_str2id.get('_'+parts[1])
                 tail_id=ent_str2id.get(parts[2])
-                
+
                 if head_id is not None and rel_id is not None and tail_id is not None:
                     tuple=(head_id, rel_id)
                     exist_tailset=tuple2tailset.get(tuple)
@@ -101,7 +101,7 @@ def load_all_triples_inIDs(ent_str2id, relation_str2id, tuple2tailset):
                         exist_tailset.add(tail_id)
                         tuple2tailset[tuple]=exist_tailset
                         add_sum+=1
-                   
+
 #                 if tail_id is not None and r_rel_id is not None and head_id is not None:
 #                     tuple=(tail_id, r_rel_id)
 #                     exist_tailset=tuple2tailset.get(tuple)

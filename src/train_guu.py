@@ -16,13 +16,13 @@ from theano.tensor.signal import downsample
 from random import shuffle
 from preprocess import rel_idmatrix_to_word2vec_init, rel_idlist_to_word2vec_init
 from preprocess_socher_guu import load_guu_data, load_all_triples_inIDs, neg_entity_tensor
-from common_functions import create_conv_para, cosine_tensor3_tensor4, cosine_tensors, GRU_Batch_Tensor_Input_with_Mask_with_MatrixInit, Conv_with_input_para, LSTM_Batch_Tensor_Input_with_Mask, create_ensemble_para, L2norm_paraList, Diversify_Reg, create_GRU_para, GRU_Batch_Tensor_Input_with_Mask, create_LSTM_para, load_word2vec
-def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0.001, rel_emb_size=300, margin=0.5, ent_emb_size=300, batch_size=50, maxSentLen=5, neg_size=20):
+from common_functions import store_model_to_file, create_conv_para, cosine_tensor3_tensor4, rmsprop, cosine_tensors, Adam, GRU_Batch_Tensor_Input_with_Mask_with_MatrixInit, Conv_with_input_para, LSTM_Batch_Tensor_Input_with_Mask, create_ensemble_para, L2norm_paraList, Diversify_Reg, create_GRU_para, GRU_Batch_Tensor_Input_with_Mask, create_LSTM_para, load_word2vec
+def evaluate_lenet5(learning_rate=0.5, n_epochs=2000, L2_weight=0.001, Div_reg=0.001, rel_emb_size=300, margin=0.5, ent_emb_size=300, batch_size=50, maxSentLen=5, neg_size=20):
     model_options = locals().copy()
     print "model options", model_options
 
     rng = np.random.RandomState(1234)    #random seed, control the model generates the same results
-
+    rootPath='/mounts/data/proj/wenpeng/Dataset/FB_socher/path/'
     corpus,rel_id2wordlist,ent_str2id, relation_str2id, tuple2tailset  =load_guu_data(maxPathLen=maxSentLen)  #minlen, include one label, at least one word in the sentence
 #     tuple2tailset=load_all_triples_inIDs(ent_str2id, relation_str2id, tuple2tailset)
     train_set=corpus[0]
@@ -91,8 +91,8 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0
 #     loss=T.sum(raw_loss*path_mask.dimshuffle('x', 0,1))
     valid_indice_list=T.repeat(path_mask.dimshuffle('x', 0,1), neg_size, axis=0).flatten().nonzero()[0]
     loss=T.sum(raw_loss.flatten()[valid_indice_list])
-    
-    
+
+
 
     #loss for testing
     dot_prod=T.dot(pred_last_ents, vocab_inputs) #(batch, hidden) * (hidden, vocab_size) == (batch, vocab_size)
@@ -102,6 +102,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0
 
 
     params = [rel_embeddings, ent_embeddings]+NN_para   # put all model parameters together
+    params_to_store= [rel_embeddings, ent_embeddings]+NN_para
     L2_reg =L2norm_paraList([rel_embeddings, ent_embeddings, U1, W1])
 #     diversify_reg= Diversify_Reg(U_a.T)+Diversify_Reg(conv_W_into_matrix)
 
@@ -118,6 +119,11 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0
         updates.append((param_i, param_i - learning_rate * grad_i / (T.sqrt(acc)+1e-8)))   #1e-8 is add to get rid of zero division
         updates.append((acc_i, acc))
 
+#     updates=Adam(cost=cost, params=params, lr=learning_rate)
+
+#     grads = T.grad(cost, params)
+#     opt = rmsprop(params)
+#     updates = opt.updates(params, grads, np.float32(0.1) / np.cast['float32'](batch_size), np.float32(0.9))
 
     train_model = theano.function([init_heads,path_id_matrix, path_w2v_tensor3, path_mask, target_entities, neg_entities_tensor ], cost, updates=updates,on_unused_input='ignore')
 
@@ -233,6 +239,8 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.001, Div_reg=0
                 hit10=succ/len(test_batch_start)
                 if hit10 > max_acc:
                     max_acc=hit10
+                    store_model_to_file(rootPath+'Best_Paras', params_to_store)
+                    print 'Finished storing best  params'
                 print 'current hit10:', hit10, '\t\t\t\t\tmax hit10:', max_acc
 
 
