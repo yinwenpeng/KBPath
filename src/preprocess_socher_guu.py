@@ -174,6 +174,21 @@ def add_tuple2tailset(ent_path, one_path, tuple2tailset):
         if tail not in tailset:
             tailset.add(tail)
             tuple2tailset[tuple]=tailset
+def add_rel2tailset(ent_path, one_path, rel2tailset):
+    size=len(one_path)
+    if len(ent_path)!=size+1:
+        print 'len(ent_path)!=len(one_path)+1:', len(ent_path),size
+        exit(0)
+    for i in range(size):
+#         tuple=(ent_path[i], one_path[i])
+        tail=ent_path[i+1]
+        rel=one_path[i]
+        tailset=rel2tailset.get(rel)
+        if tailset is None:
+            tailset=set()
+        if tail not in tailset:
+            tailset.add(tail)
+            rel2tailset[rel]=tailset
 def add_ent2relset(ent_path, one_path, ent2relset, maxSetSize):
     size=len(one_path)
     if len(ent_path)!=size+1:
@@ -298,6 +313,7 @@ def load_guu_data_v2(maxPathLen=20):
     relation_id2wordlist={}
     ent_str2id={}
     tuple2tailset={}
+    rel2tailset={}
     train_paths_store=[]
     train_ents_store=[]
     ent2relset={}
@@ -349,6 +365,7 @@ def load_guu_data_v2(maxPathLen=20):
                     relation_id2wordlist[rel_id]=wordlist
                     one_path.append(rel_id)
                 add_tuple2tailset(ent_path, one_path, tuple2tailset)
+                add_rel2tailset(ent_path, one_path, rel2tailset)
                 ent2relset_maxSetSize=add_ent2relset(ent_path, one_path, ent2relset, ent2relset_maxSetSize)
 
                 #pad
@@ -359,7 +376,7 @@ def load_guu_data_v2(maxPathLen=20):
                 if pad_size > 0:
                     one_path=[0]*pad_size+one_path
                     # ent_path=ent_path[:pad_size]+ent_path
-                    ent_path=ent_path[:1]+ent_path[1:2]*pad_size+ent_path[1:]
+                    ent_path=ent_path[:1]*(pad_size+1)+ent_path[1:]
                     one_mask=[0.0]*pad_size+[1.0]*valid_size
                 else:
                     one_path=one_path[-maxPathLen:]  # select the last max_len relations
@@ -388,7 +405,7 @@ def load_guu_data_v2(maxPathLen=20):
             print '\t\t\t\tload over, overall ',    len(train_paths_store), ' train,', len(test_paths_store), ' test,', 'tuple2tailset size:', len(tuple2tailset),', max path len:', max_path_len, 'max ent2relsetSize:', ent2relset_maxSetSize
 
     return ((train_paths_store, train_masks_store, train_ents_store),
-            (test_paths_store, test_masks_store, test_ents_store)) , relation_id2wordlist,ent_str2id, relation_str2id, tuple2tailset, ent2relset, ent2relset_maxSetSize
+            (test_paths_store, test_masks_store, test_ents_store)) , relation_id2wordlist,ent_str2id, relation_str2id, tuple2tailset, rel2tailset, ent2relset, ent2relset_maxSetSize
 def neg_entity_tensor(ent_idmatrix, rel_idmatrix, pair2tailset, neg_size, ent_vocab_set):
     batch_size=len(ent_idmatrix)
     length=len(rel_idmatrix[0])
@@ -410,7 +427,34 @@ def neg_entity_tensor(ent_idmatrix, rel_idmatrix, pair2tailset, neg_size, ent_vo
             negs.append(neg_list)
     return numpy.asarray(negs, dtype='int32').reshape((batch_size, length, neg_size))
 
-
+def neg_entity_tensor_v2(ent_idmatrix, rel_idmatrix, pair2tailset, rel2tailset, neg_size, ent_vocab_set):
+    batch_size=len(ent_idmatrix)
+    length=len(rel_idmatrix[0])
+    if len(ent_idmatrix[0])!=length+1:
+        print 'error in neg ent generation, len(ent_idlist)!=length+1:', len(ent_idmatrix[0]), length
+        exit(0)
+    negs=[]
+    for ba in range(batch_size):
+        for i in range(length):
+            rel_id=rel_idmatrix[ba][i]
+            pair=(ent_idmatrix[ba][i], rel_id)
+            tailset=pair2tailset.get(pair)
+            if tailset is None:
+                tailset=set()
+#             if ent_idmatrix[ba][i+1] not in tailset:
+#                 print 'error in neg ent generation'
+            rel_tailset=rel2tailset.get(rel_id)
+            if rel_tailset is None:
+                rel_tailset=set()
+            key_neg_range_set=rel_tailset-tailset
+            remain_size=neg_size-len(key_neg_range_set)
+            if remain_size<=0:
+                neg_list=random.sample(key_neg_range_set, neg_size)
+            else:
+                neg_cand_set=ent_vocab_set-key_neg_range_set
+                neg_list=list(key_neg_range_set)+random.sample(neg_cand_set, remain_size)
+            negs.append(neg_list)
+    return numpy.asarray(negs, dtype='int32').reshape((batch_size, length, neg_size))
 
 
 

@@ -1,7 +1,6 @@
 import numpy
 import theano
 import theano.tensor as T
-import theano.tensor.nlinalg
 from theano.tensor.nnet import conv
 from cis.deep.utils.theano import debug_print
 from logistic_sgd import LogisticRegression
@@ -375,6 +374,24 @@ class Bd_GRU_Batch_Tensor_Input_with_Mask(object):
 #         self.output_sent_rep=self.output_tensor[:,:,-1]
         self.output_sent_rep_maxpooling=fwd.output_tensor[:,:,-1]+bwd.output_tensor[:,:,-1]
 #         self.output_sent_rep_maxpooling=T.concatenate([fwd.output_tensor[:,:,-1], bwd.output_tensor[:,:,-1]], axis=1)
+
+class GRU_OneStep_Matrix_Input(object):
+    def __init__(self, X, MatrixInit, hidden_dim, U, W, b):
+        #now, X is (batch, emb_size)
+        #MatrixInit (batch, hidden)
+        
+        x_t=X.T #(hidden_size, batch)
+        s_t1_prev=MatrixInit.T  #(hidden_size, batch)
+
+        z_t1 =T.nnet.sigmoid(U[0].dot(x_t) + W[0].dot(s_t1_prev) + T.repeat(b[0].reshape((hidden_dim,1)), X.shape[0], axis=1)) #maybe here has a bug, as b is vector while dot product is matrix
+        r_t1 = T.nnet.sigmoid(U[1].dot(x_t) + W[1].dot(s_t1_prev) + T.repeat(b[1].reshape((hidden_dim,1)), X.shape[0], axis=1))
+        c_t1 = T.tanh(U[2].dot(x_t) + W[2].dot(s_t1_prev * r_t1) + T.repeat(b[2].reshape((hidden_dim,1)), X.shape[0], axis=1))
+        s_t1 = (T.ones_like(z_t1) - z_t1) * c_t1 + z_t1 * s_t1_prev  #(hidden, batch)
+
+
+
+        self.matrix=s_t1.T 
+
 class GRU_Batch_Tensor_Input_with_Mask_with_MatrixInit(object):
     def __init__(self, X, Mask, MatrixInit, hidden_dim, U, W, b):
         #now, X is (batch, emb_size, sentlength)
@@ -1404,10 +1421,7 @@ def Diversify_Reg(W):
     loss=((W.dot(W.T)-T.eye(n=W.shape[0], m=W.shape[0], k=0, dtype=theano.config.floatX))**2).sum()
     return loss
 
-def Determinant(W):
-    prod=W.dot(W.T)
-    loss=-T.log(theano.tensor.nlinalg.Det()(prod))
-    return loss
+
 
 def normalize_matrix(M):
     norm=T.sqrt(T.sum(T.sqr(M)))
