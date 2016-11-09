@@ -17,7 +17,7 @@ from random import shuffle
 from preprocess import rel_idmatrix_to_word2vec_init, rel_idlist_to_word2vec_init
 from preprocess_socher_guu import load_guu_data, load_all_triples_inIDs, neg_entity_tensor, load_guu_data_v2, neg_entity_tensor_v2
 from common_functions import store_model_to_file, load_model_from_file, create_conv_para, cosine_tensor3_tensor4, rmsprop, cosine_tensors, Adam, GRU_Batch_Tensor_Input_with_Mask_with_MatrixInit, Conv_with_input_para, LSTM_Batch_Tensor_Input_with_Mask, create_ensemble_para, L2norm_paraList, Diversify_Reg, create_GRU_para, GRU_Batch_Tensor_Input_with_Mask, create_LSTM_para, load_word2vec
-def evaluate_lenet5(learning_rate=0.01, n_epochs=2000, L2_weight=0.00001, max_performance=0.46857, Div_reg=0.001, rel_emb_size=300, margin=0.3, ent_emb_size=300, batch_size=50, maxSentLen=5, neg_size=20):
+def evaluate_lenet5(learning_rate=0.001, n_epochs=2000, L2_weight=0.00001, max_performance=0.523529411766, Div_reg=0.1, rel_emb_size=300, margin=0.07, ent_emb_size=300, batch_size=20, maxSentLen=5, neg_size=10):
     model_options = locals().copy()
     print "model options", model_options
 
@@ -71,7 +71,7 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=2000, L2_weight=0.00001, max_pe
     U1, W1, b1=create_GRU_para(rng, rel_emb_size, ent_emb_size)
     NN_para=[U1, W1, b1]     #U1 includes 3 matrices, W1 also includes 3 matrices b1 is bias
     params_to_store= [rel_embeddings, ent_embeddings]+NN_para
-    load_model_from_file(rootPath+'Best_Paras_v1_0.468571428571', params_to_store)
+    load_model_from_file(rootPath+'Best_Paras_v1_0.523529411765', params_to_store)
     
     
     
@@ -110,10 +110,10 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=2000, L2_weight=0.00001, max_pe
 
     params = [rel_embeddings, ent_embeddings]+NN_para   # put all model parameters together
     
-    L2_reg =L2norm_paraList([rel_embeddings, U1, W1]) #ent_embeddings, 
+    L2_reg =L2norm_paraList([U1, W1]) #ent_embeddings, rel_embeddings, 
 #     diversify_reg= Diversify_Reg(U_a.T)+Diversify_Reg(conv_W_into_matrix)
 
-    cost=loss+L2_weight*L2_reg
+    cost=loss#+L2_weight*L2_reg
 
     grads = T.grad(cost, params)    # create a list of gradients for all model parameters
     accumulator=[]
@@ -190,7 +190,7 @@ def evaluate_lenet5(learning_rate=0.01, n_epochs=2000, L2_weight=0.00001, max_pe
 #                                       neg_entity_tensor(ent_idmatrix, rel_idmatrix, tuple2tailset, neg_size, ent_vocab_set))
 
             #after each 1000 batches, we test the performance of the model on all test data
-            if iter%100==0:
+            if iter%50==0:
                 print 'Epoch ', epoch, 'iter '+str(iter)+' average cost: '+str(cost_i/iter_accu), 'uses ', (time.time()-past_time)/60.0, 'min'
                 print 'Testing...'
                 past_time = time.time()

@@ -437,8 +437,8 @@ def load_das_train(maxPathLen=20, example_limit=10000):
             ent_path=ent_path[:1]*(pad_size+1)+ent_path[1:]
             one_mask=[0.0]*pad_size+[1.0]*valid_size
         else:
-            one_path=one_path[-maxPathLen:]  # select the last max_len relations
-            ent_path=ent_path[:1]+ent_path[-maxPathLen:]
+            one_path=one_path[:maxPathLen]  # select the first max_len relations
+            ent_path=ent_path[:maxPathLen+1]
             one_mask=[1.0]*maxPathLen
 
 
@@ -624,6 +624,7 @@ def compute_map(sub_probs,sub_labels ):
     sub_dict = [(prob, label) for prob, label in izip(sub_probs, sub_labels)] # a list of tuple
     #sorted_probs=sorted(sub_probs, reverse = True)
     sorted_tuples=sorted(sub_dict,key=lambda tup: tup[0], reverse = True) 
+
     map=0.0
 #     find=False
     corr_no=0
