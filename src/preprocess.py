@@ -83,7 +83,7 @@ def load_relationPath_and_labels(maxPathLen=20):
     dev_targets_store=[]
     dev_masks_store=[]
     dev_labels_store=[]
-    
+
     test_paths_store=[]
     test_targets_store=[]
     test_masks_store=[]
@@ -110,9 +110,9 @@ def load_relationPath_and_labels(maxPathLen=20):
             filename=rootPath+folder+'/'+fil
             print 'loading', folder+'/'+fil, '...'
             readfile=open(filename, 'r')
-            
+
             for line in readfile:
-                
+
                 parts=line.strip().split('\t')
                 if (len(parts) !=3 and file_id <2) or (len(parts) !=4 and file_id >=2):
                     print 'len(parts):', len(parts), 'file_id:', file_id
@@ -121,9 +121,9 @@ def load_relationPath_and_labels(maxPathLen=20):
                 relationPaths=parts[2]
                 path_list=relationPaths.split('###')
                 for relationPath in path_list:
-                    
+
                     one_path=[]
-                    one_mask=[]                
+                    one_mask=[]
                     pathSplit=relationPath.split('-')
                     for potential_relation in pathSplit:
                         if potential_relation.find('/m/')<0: # is a relation
@@ -145,44 +145,44 @@ def load_relationPath_and_labels(maxPathLen=20):
                     else:
                         one_path=one_path[:maxPathLen]
                         one_mask=[1.0]*maxPathLen
-                    
+
                     if file_id <2:
                         train_paths_store.append(one_path)
                         train_masks_store.append(one_mask)
-                        train_targets_store.append(target_rel_id)                    
+                        train_targets_store.append(target_rel_id)
                         if file_id ==0:#posi is 1, nega is 0
                             train_labels_store.append(1)
                         else:
                             train_labels_store.append(0)
-                         
+
                     if file_id ==2 :
                         dev_paths_store.append(one_path)
                         dev_masks_store.append(one_mask)
-                        dev_targets_store.append(target_rel_id)                    
-                     
+                        dev_targets_store.append(target_rel_id)
+
                         if parts[3]=='1':
                             dev_labels_store.append(1)
                         else:
                             dev_labels_store.append(0)
-                                
+
                     if file_id ==3:
                         test_paths_store.append(one_path)
                         test_masks_store.append(one_mask)
-                        test_targets_store.append(target_rel_id)                    
-                        
+                        test_targets_store.append(target_rel_id)
+
                         if parts[3]=='1':
                             test_labels_store.append(1)
                         else:
                             test_labels_store.append(0)
-                                
-            readfile.close()  
-            print '\t\t\t\tload over, overall ',    len(train_paths_store), ' train,', len(dev_paths_store), ' dev,', len(test_paths_store), ' test'   
-      
+
+            readfile.close()
+            print '\t\t\t\tload over, overall ',    len(train_paths_store), ' train,', len(dev_paths_store), ' dev,', len(test_paths_store), ' test'
+
     return ((train_paths_store, train_targets_store, train_masks_store, train_labels_store),
             (dev_paths_store, dev_targets_store, dev_masks_store, dev_labels_store),
-            (test_paths_store, test_targets_store, test_masks_store, test_labels_store)) , relation_id2wordlist,word2id             
-                        
-            
+            (test_paths_store, test_targets_store, test_masks_store, test_labels_store)) , relation_id2wordlist,word2id
+
+
 def rel_idmatrix_to_word2vec_init(idmatrix, id2wordlist, word2vec, dim):
     emb_tensor=[]
     for idlist in idmatrix:
@@ -191,7 +191,7 @@ def rel_idmatrix_to_word2vec_init(idmatrix, id2wordlist, word2vec, dim):
     return emb_tensor   #(batch, len, emb_size)
 
 
-    
+
 def rel_idlist_to_word2vec_init(idlist, id2wordlist, word2vec, dim):
     zero_emb=list(numpy.zeros(dim))
     overall_emblist=[]
@@ -211,7 +211,25 @@ def rel_idlist_to_word2vec_init(idlist, id2wordlist, word2vec, dim):
             sum_emb=numpy.sum(numpy.asarray(emb_list), axis=0)
             overall_emblist.append(sum_emb)
     return overall_emblist #(len, emb_size)
+
+def rel_id_to_word2vec_init(id, id2wordlist, word2vec, dim):
+    zero_emb=list(numpy.zeros(dim))
+
+    emb_list=[]
+    wordlist=id2wordlist.get(id)
+    if wordlist is None:
+        print 'wordlist is None'
+        exit(0)
+    for word in wordlist:
+        emb=word2vec.get(word)
+        if emb is not None:
+            emb_list.append(emb)
+    if len(emb_list)==0:
+        emb_list.append(zero_emb)
+    sum_emb=numpy.sum(numpy.asarray(emb_list), axis=0)
             
+    return sum_emb #(len, emb_size)
+
 def ent2relSet_pad(ent_size, ent2relset, maxSetSize):
     idvector=[]
     maskvector=[]
@@ -235,15 +253,15 @@ def ent2relSet_pad(ent_size, ent2relset, maxSetSize):
         idvector+=idlist
         maskvector+=mask
     return idvector, maskvector
-        
-    
+
+
 def deal_with_one_line(head, tail, paths):
     path_list=paths.split('###')
     overall_path=[]
     for relationPath in path_list:
-        
+
         one_path=[]
-        one_path.append(head)               
+        one_path.append(head)
         pathSplit=relationPath.split('-')
         valid_path=True
         for id, potential_relation in enumerate(pathSplit):
@@ -268,8 +286,8 @@ def deal_with_one_line(head, tail, paths):
             one_path.append(tail)
             overall_path.append('\t'.join(one_path))
     return overall_path
-        
-                
+
+
 
 def reformat_UMASS(maxPathLen=20):
     rootPath='/mounts/data/proj/wenpeng/Dataset/UMASS_relation_pred/release_with_entities_akbc/'
@@ -320,10 +338,10 @@ def reformat_UMASS(maxPathLen=20):
              '_tv_tv_program_country_of_origin',
              '_tv_tv_program_genre']
     files=['positive_matrix.tsv.translated','negative_matrix.tsv.translated','dev_matrix.tsv.translated','test_matrix.tsv.translated']
-    
+
     writetrain=open(rootPath+'wenpeng/train.txt', 'w')
-    
-    
+
+
     for file_id, fil in enumerate(files):
 #         file_paths_store=[]
 #         file_targets_store=[]
@@ -337,9 +355,9 @@ def reformat_UMASS(maxPathLen=20):
             readfile=open(filename, 'r')
             if file_id==3:
                 writetest=open(rootPath+'wenpeng/test'+folder+'.txt', 'w')
-            
+
             for line in readfile:
-                
+
                 parts=line.strip().split('\t')
                 if (len(parts) !=3 and file_id <2) or (len(parts) !=4 and file_id >=2):
                     print 'len(parts):', len(parts), 'file_id:', file_id
@@ -348,36 +366,36 @@ def reformat_UMASS(maxPathLen=20):
                 relationPaths=parts[2]
                 head=parts[0]
                 tail=parts[1]
-                
+
                 path_list=deal_with_one_line(head, tail, relationPaths)
                 for path in path_list:
                     writetrain.write(path+'\n')
-                    
 
 
-                    
+
+
                 if file_id ==0: #posi
                     writetrain.write(head+'\t'+target_rel+'\t'+tail+'\n')
-                         
+
                 if file_id ==2 or file_id ==3 :
                     if parts[3]=='1':
                         writetrain.write(head+'\t'+target_rel+'\t'+tail+'\n')
-                
+
                 #creat test file
                 if file_id ==3:
                     if parts[3]=='-1':
                         writetest.write(head+'\t'+target_rel+'\t'+tail+'\t0'+'\n')
                     else:
                         writetest.write(head+'\t'+target_rel+'\t'+tail+'\t1'+'\n')
-            if file_id ==3:                   
-                writetest.close() 
-            readfile.close() 
+            if file_id ==3:
+                writetest.close()
+            readfile.close()
     writetrain.close()
     print 'reformat over'
 
 def load_das_train(maxPathLen=20, example_limit=10000):
     filename='/mounts/data/proj/wenpeng/Dataset/UMASS_relation_pred/release_with_entities_akbc/wenpeng/train.txt'
-    
+
     relation_str2id={}
     relation_id2wordlist={}
     ent_str2id={}
@@ -459,7 +477,7 @@ def load_das_train(maxPathLen=20, example_limit=10000):
     readfile.close()
     print '\t\t\t\tload over, overall ',    len(train_paths_store), ' train,', 'tuple2tailset size:', len(tuple2tailset),', max path len:', max_path_len, 'max ent2relsetSize:', ent2relset_maxSetSize
 
-    return (train_paths_store, train_masks_store, train_ents_store), relation_id2wordlist,ent_str2id, relation_str2id, tuple2tailset, rel2tailset, ent2relset, ent2relset_maxSetSize                            
+    return (train_paths_store, train_masks_store, train_ents_store), relation_id2wordlist,ent_str2id, relation_str2id, tuple2tailset, rel2tailset, ent2relset, ent2relset_maxSetSize
 
 def keylist_2_valuelist(keylist, dic, start_index=0):
     value_list=[]
@@ -469,7 +487,7 @@ def keylist_2_valuelist(keylist, dic, start_index=0):
             value=len(dic)+start_index
             dic[key]=value
         value_list.append(value)
-    return value_list    
+    return value_list
 
 def add_tuple2tailset(ent_path, one_path, tuple2tailset):
     size=len(one_path)
@@ -515,8 +533,8 @@ def add_ent2relset(ent_path, one_path, ent2relset, maxSetSize):
             relset.add(rel_id)
             if len(relset) > maxSetSize:
                 maxSetSize=len(relset)
-            ent2relset[ent_id]=relset 
-    return maxSetSize   
+            ent2relset[ent_id]=relset
+    return maxSetSize
 
 def load_das_test(rel2id, ent2id, relation_id2wordlist, folders_limit=10):
     rootpath='/mounts/data/proj/wenpeng/Dataset/UMASS_relation_pred/release_with_entities_akbc/wenpeng/'
@@ -578,7 +596,7 @@ def load_das_test(rel2id, ent2id, relation_id2wordlist, folders_limit=10):
         folder_labels_store=[] # a list
 #         line_co=0
         for line in readfile:
-    
+
             parts=line.strip().split('\t')
             if len(parts) !=4:
                 print 'len(parts) !=4:', line
@@ -589,7 +607,7 @@ def load_das_test(rel2id, ent2id, relation_id2wordlist, folders_limit=10):
             label=int(parts[3])
 
             ent_path=keylist_2_valuelist(ent_list, ent2id, 0)
-            
+
             rel_id=rel2id.get(rel_str)
             if rel_id is None:
                 rel_id=len(rel2id)+1
@@ -599,17 +617,17 @@ def load_das_test(rel2id, ent2id, relation_id2wordlist, folders_limit=10):
             relation_id2wordlist[rel_id]=wordlist
             one_path=[rel_id]
             one_mask=[1.0]
-            
+
 #             add_tuple2tailset(ent_path, one_path, tuple2tailset)
 #             add_rel2tailset(ent_path, one_path, rel2tailset)
 #             ent2relset_maxSetSize=add_ent2relset(ent_path, one_path, ent2relset, ent2relset_maxSetSize)
-    
+
 
             folder_paths_store.append(one_path)
             folder_ents_store.append(ent_path)
             folder_masks_store.append(one_mask)
             folder_labels_store.append(label)
-    
+
         folders_paths_store.append(folder_paths_store)
         folders_ents_store.append(folder_ents_store)
         folders_masks_store.append(folder_masks_store)
@@ -623,7 +641,7 @@ def compute_map(sub_probs,sub_labels ):
 
     sub_dict = [(prob, label) for prob, label in izip(sub_probs, sub_labels)] # a list of tuple
     #sorted_probs=sorted(sub_probs, reverse = True)
-    sorted_tuples=sorted(sub_dict,key=lambda tup: tup[0], reverse = True) 
+    sorted_tuples=sorted(sub_dict,key=lambda tup: tup[0], reverse = True)
 
     map=0.0
 #     find=False
@@ -639,11 +657,243 @@ def compute_map(sub_probs,sub_labels ):
 #     for index, (prob,label) in enumerate(sorted_tuples):
 #         if label==1:
 #             all_mrr+=1.0/(index+1)
-#             break # only consider the first correct answer              
+#             break # only consider the first correct answer
 #     if find is False:
 #         print 'Did not find correct answers'
 #         exit(0)
     map=map/corr_no
     return map
-if __name__ == '__main__':    
+
+def load_das_v2(maxPathLen=20, path_size=10):
+    rootPath='/mounts/data/proj/wenpeng/Dataset/UMASS_relation_pred/release_with_entities_akbc/'
+    folders=['_architecture_structure_address',
+             '_aviation_airport_serves',
+             '_book_book_characters',
+             '_book_literary_series_works_in_this_series',
+             '_book_written_work_original_language',
+             '_broadcast_content_artist',
+             '_broadcast_content_genre',
+             '_business_industry_companies',
+             '_cvg_computer_videogame_cvg_genre',
+             '_cvg_game_version_game',
+             '_cvg_game_version_platform',
+             '_education_educational_institution_campuses',
+             '_education_educational_institution_school_type',
+             '_film_film_cinematography',
+             '_film_film_country',
+             '_film_film_directed_by',
+             '_film_film_film_festivals',
+             '_film_film_language',
+             '_film_film_music',
+             '_film_film_rating',
+             '_film_film_sequel',
+             '_geography_river_cities',
+             '_geography_river_mouth',
+             '_location_location_contains',
+             '_music_album_genre',
+             '_music_artist_genre',
+             '_music_artist_label',
+             '_music_artist_origin',
+             '_music_composition_composer',
+             '_music_composition_lyricist',
+             '_music_genre_albums',
+             '_organization_organization_founders',
+             '_organization_organization_locations',
+             '_organization_organization_sectors',
+             '_people_deceased_person_cause_of_death',
+             '_people_deceased_person_place_of_death',
+             '_people_ethnicity_people',
+             '_people_family_members',
+             '_people_person_nationality',
+             '_people_person_place_of_birth',
+             '_people_person_profession',
+             '_people_person_religion',
+             '_soccer_football_player_position_s',
+             '_time_event_locations',
+             '_tv_tv_program_country_of_origin',
+             '_tv_tv_program_genre']
+    files=['positive_matrix.tsv.translated','negative_matrix.tsv.translated','test_matrix.tsv.translated']
+    relation_str2id={}
+    entity_str2id={}
+    relation_id2wordlist={}
+
+
+    tuple2tailset={}
+    rel2tailset={}
+    ent2relset={}
+    ent2relset_maxSetSize=0
+
+    train_pos_rels_matrix_folders=[]
+    train_pos_masks_matrix_folders=[]
+    train_pos_ents_matrix_folders=[]
+
+    train_neg_rels_matrix_folders=[]
+    train_neg_masks_matrix_folders=[]
+    train_neg_ents_matrix_folders=[]
+
+    test_pos_rels_matrix_folders=[]
+    test_pos_masks_matrix_folders=[]
+    test_pos_ents_matrix_folders=[]
+
+    test_neg_rels_matrix_folders=[]
+    test_neg_masks_matrix_folders=[]
+    test_neg_ents_matrix_folders=[]
+
+    target_rels_list=[]
+
+    for folder in folders[:2]:
+        target_rel=replacePunctuationsInStrByUnderline(folder).strip()
+        target_rel_id=relation_str2id.get(target_rel)
+        if target_rel_id is None:
+            target_rel_id=len(relation_str2id)+1
+            relation_str2id[target_rel]=target_rel_id
+            wordlist=target_rel.split('_')
+            relation_id2wordlist[target_rel_id]=wordlist
+        target_rels_list.append(target_rel_id)
+
+        train_pos_rels_matrix=[]
+        train_pos_masks_matrix=[]
+        train_pos_ents_matrix=[]
+
+        train_neg_rels_matrix=[]
+        train_neg_masks_matrix=[]
+        train_neg_ents_matrix=[]
+
+        test_pos_rels_matrix=[]
+        test_pos_masks_matrix=[]
+        test_pos_ents_matrix=[]
+
+        test_neg_rels_matrix=[]
+        test_neg_masks_matrix=[]
+        test_neg_ents_matrix=[]
+        for file_id, fil in enumerate(files):
+
+
+
+            filename=rootPath+folder+'/'+fil
+            print 'loading', folder+'/'+fil, '...'
+            readfile=open(filename, 'r')
+
+            for line in readfile:
+
+                parts=line.strip().split('\t')
+                if (len(parts) !=3 and file_id <2) or (len(parts) !=4 and file_id >=2):
+                    print 'len(parts):', len(parts), 'file_id:', file_id
+                    exit(0)
+
+
+                relationPaths=parts[2]
+                head=parts[0]
+                tail=parts[1]
+
+                path_list=deal_with_one_line(head, tail, relationPaths)
+
+                current_path_size=len(path_list)
+                if current_path_size ==0:
+#                     print line
+#                     print path_list
+#                     exit(0)
+                    continue
+                repeat_path_times=path_size/current_path_size
+                remain_path_times=path_size%current_path_size
+                if current_path_size < path_size:
+                    path_list=path_list*repeat_path_times+path_list[:remain_path_times]
+                else:
+                    path_list=path_list[:path_size]
+
+
+                for relationPath in path_list:
+
+                    one_path=[]
+                    one_mask=[]
+                    one_ents=[]
+                    pathSplit=relationPath.split() #ent and rel appear alternatively
+                    for id, potential_relation in enumerate(pathSplit):
+                        if id % 2 ==1: # is a relation
+
+                            rel_id=relation_str2id.get(potential_relation)
+                            if rel_id is None:
+                                rel_id=len(relation_str2id)+1
+                                relation_str2id[potential_relation]=rel_id
+                                wordlist=potential_relation.split('_')
+#                                 wordIdList=strs2ids(potential_relation.split(), word2id)
+                                relation_id2wordlist[rel_id]=wordlist
+                            one_path.append(rel_id)
+                        else: # is a ent
+                            ent_id=entity_str2id.get(potential_relation)
+                            if ent_id is None:
+                                ent_id=len(entity_str2id)
+                                entity_str2id[potential_relation]=ent_id
+                            one_ents.append(ent_id)
+                    add_tuple2tailset(one_ents, one_path, tuple2tailset)
+                    add_rel2tailset(one_ents, one_path, rel2tailset)
+                    ent2relset_maxSetSize=add_ent2relset(one_ents, one_path, ent2relset, ent2relset_maxSetSize)
+                    #pad
+                    valid_size=len(one_path)
+                    pad_size=maxPathLen-valid_size
+                    if pad_size > 0:
+                        one_path=[0]*pad_size+one_path
+                        one_mask=[0.0]*pad_size+[1.0]*valid_size
+                        one_ents=one_ents[:1]*(pad_size+1)+one_ents[1:]
+                    else:
+                        one_path=one_path[:maxPathLen]
+                        one_mask=[1.0]*maxPathLen
+                        one_ents=one_ents[:maxPathLen+1]
+                    
+#                     if len(one_path)!=maxPathLen or len(one_ents)!=maxPathLen+1:
+#                         print 'len(one_path)!=maxPathLen or len(one_ents)!=maxPathLen+1:', len(one_path), len(one_ents), maxPathLen
+#                         exit(0)
+                    
+                    
+#                     print 'maxPathLen:', maxPathLen
+#                     print 'one_path:', one_path
+#                     print 'one_ents:', one_ents
+#                     exit(0)
+                    if file_id ==0: #train pos
+                        train_pos_rels_matrix.append(one_path)
+                        train_pos_masks_matrix.append(one_mask)
+                        train_pos_ents_matrix.append(one_ents)
+
+                    if file_id ==1: #train neg
+                        train_neg_rels_matrix.append(one_path)
+                        train_neg_masks_matrix.append(one_mask)
+                        train_neg_ents_matrix.append(one_ents)
+
+                    if file_id ==2 : #test file
+                        if parts[3]=='1':
+                            test_pos_rels_matrix.append(one_path)
+                            test_pos_masks_matrix.append(one_mask)
+                            test_pos_ents_matrix.append(one_ents)
+                        else:
+                            test_neg_rels_matrix.append(one_path)
+                            test_neg_masks_matrix.append(one_mask)
+                            test_neg_ents_matrix.append(one_ents)
+            readfile.close()
+        #store each folder
+        train_pos_ents_matrix_folders.append(train_pos_ents_matrix)
+        train_pos_rels_matrix_folders.append(train_pos_rels_matrix)
+        train_pos_masks_matrix_folders.append(train_pos_masks_matrix)
+
+        train_neg_ents_matrix_folders.append(train_neg_ents_matrix)
+        train_neg_rels_matrix_folders.append(train_neg_rels_matrix)
+        train_neg_masks_matrix_folders.append(train_neg_masks_matrix)
+
+        test_pos_ents_matrix_folders.append(test_pos_ents_matrix)
+        test_pos_rels_matrix_folders.append(test_pos_rels_matrix)
+        test_pos_masks_matrix_folders.append(test_pos_masks_matrix)
+
+        test_neg_ents_matrix_folders.append(test_neg_ents_matrix)
+        test_neg_rels_matrix_folders.append(test_neg_rels_matrix)
+        test_neg_masks_matrix_folders.append(test_neg_masks_matrix)
+
+            # print '\t\t\t\tload over, overall ',    len(train_paths_store), ' train,', len(dev_paths_store), ' dev,', len(test_paths_store), ' test'
+#     print train_pos_rels_matrix_folders[0]
+#     exit(0)
+    return     [[train_pos_rels_matrix_folders, train_pos_masks_matrix_folders,train_pos_ents_matrix_folders],
+        [train_neg_rels_matrix_folders, train_neg_masks_matrix_folders, train_neg_ents_matrix_folders],
+        [test_pos_rels_matrix_folders, test_pos_masks_matrix_folders, test_pos_ents_matrix_folders],
+        [test_neg_rels_matrix_folders, test_neg_masks_matrix_folders, test_neg_ents_matrix_folders]], target_rels_list, relation_str2id, entity_str2id, relation_id2wordlist, tuple2tailset, rel2tailset, ent2relset, ent2relset_maxSetSize
+
+
+if __name__ == '__main__':
     reformat_UMASS()
