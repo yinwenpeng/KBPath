@@ -257,7 +257,7 @@ def ent2relSet_pad(ent_size, ent2relset, maxSetSize):
 
 def deal_with_one_line(head, tail, paths):
     path_list=paths.split('###')
-    overall_path=[]
+    overall_path=[] # a list of path, path is separed by \tab
     for relationPath in path_list:
 
         one_path=[]
@@ -524,7 +524,7 @@ def add_ent2relset(ent_path, one_path, ent2relset, maxSetSize):
         print 'len(ent_path)!=len(one_path)+1:', len(ent_path),size
         exit(0)
     for i in range(size):
-        ent_id=ent_path[i+1]
+        ent_id=ent_path[i+1]    #why is the tail entity of the rel?
         rel_id=one_path[i]
         relset=ent2relset.get(ent_id)
         if relset is None:
@@ -726,22 +726,28 @@ def load_das_v2(maxPathLen=20, path_size=10):
     train_pos_rels_matrix_folders=[]
     train_pos_masks_matrix_folders=[]
     train_pos_ents_matrix_folders=[]
+    train_pos_path_masks_folders=[] #folder lists
 
     train_neg_rels_matrix_folders=[]
     train_neg_masks_matrix_folders=[]
     train_neg_ents_matrix_folders=[]
-
+    train_neg_path_masks_folders=[]
+    
     test_pos_rels_matrix_folders=[]
     test_pos_masks_matrix_folders=[]
     test_pos_ents_matrix_folders=[]
-
+    test_pos_path_masks_folders=[]
+    
     test_neg_rels_matrix_folders=[]
     test_neg_masks_matrix_folders=[]
     test_neg_ents_matrix_folders=[]
+    test_neg_path_masks_folders=[]
+    
+    target_rels_list=[] #store the folder name as target rel
+    max_path_size=0
+    min_path_size=1000000
 
-    target_rels_list=[]
-
-    for folder in folders[:2]:
+    for folder in folders[:1]:  #train a separate model for each folder
         target_rel=replacePunctuationsInStrByUnderline(folder).strip()
         target_rel_id=relation_str2id.get(target_rel)
         if target_rel_id is None:
@@ -754,18 +760,22 @@ def load_das_v2(maxPathLen=20, path_size=10):
         train_pos_rels_matrix=[]
         train_pos_masks_matrix=[]
         train_pos_ents_matrix=[]
+        train_pos_path_list=[]
 
         train_neg_rels_matrix=[]
         train_neg_masks_matrix=[]
         train_neg_ents_matrix=[]
+        train_neg_path_list=[]
 
         test_pos_rels_matrix=[]
         test_pos_masks_matrix=[]
         test_pos_ents_matrix=[]
+        test_pos_path_list=[]
 
         test_neg_rels_matrix=[]
         test_neg_masks_matrix=[]
         test_neg_ents_matrix=[]
+        test_neg_path_list=[]
         for file_id, fil in enumerate(files):
 
 
@@ -789,17 +799,24 @@ def load_das_v2(maxPathLen=20, path_size=10):
                 path_list=deal_with_one_line(head, tail, relationPaths)
 
                 current_path_size=len(path_list)
+
                 if current_path_size ==0:
 #                     print line
 #                     print path_list
 #                     exit(0)
                     continue
+                if current_path_size > max_path_size:
+                    max_path_size= current_path_size
+                if current_path_size < min_path_size:
+                    min_path_size= current_path_size
                 repeat_path_times=path_size/current_path_size
                 remain_path_times=path_size%current_path_size
-                if current_path_size < path_size:
+                if current_path_size < path_size:  #need to repeat some part
                     path_list=path_list*repeat_path_times+path_list[:remain_path_times]
+                    path_mask=[1.0]*current_path_size+[0.0]*(path_size-current_path_size) #only consider the true paths, not repeated ones
                 else:
                     path_list=path_list[:path_size]
+                    path_mask=[1.0]*path_size
 
 
                 for relationPath in path_list:
@@ -827,14 +844,14 @@ def load_das_v2(maxPathLen=20, path_size=10):
                             one_ents.append(ent_id)
                     add_tuple2tailset(one_ents, one_path, tuple2tailset)
                     add_rel2tailset(one_ents, one_path, rel2tailset)
-                    ent2relset_maxSetSize=add_ent2relset(one_ents, one_path, ent2relset, ent2relset_maxSetSize)
+                    ent2relset_maxSetSize=add_ent2relset(one_ents, one_path, ent2relset, ent2relset_maxSetSize)  #????
                     #pad
                     valid_size=len(one_path)
                     pad_size=maxPathLen-valid_size
                     if pad_size > 0:
                         one_path=[0]*pad_size+one_path
                         one_mask=[0.0]*pad_size+[1.0]*valid_size
-                        one_ents=one_ents[:1]*(pad_size+1)+one_ents[1:]
+                        one_ents=one_ents[:1]*pad_size+one_ents
                     else:
                         one_path=one_path[:maxPathLen]
                         one_mask=[1.0]*maxPathLen
@@ -868,31 +885,48 @@ def load_das_v2(maxPathLen=20, path_size=10):
                             test_neg_rels_matrix.append(one_path)
                             test_neg_masks_matrix.append(one_mask)
                             test_neg_ents_matrix.append(one_ents)
+
+                if file_id ==0: #train pos
+                    train_pos_path_list+=path_mask
+
+                if file_id ==1: #train neg
+                    train_neg_path_list+=path_mask
+
+                if file_id ==2 : #test file
+                    if parts[3]=='1':
+                        test_pos_path_list+=path_mask
+                    else:
+                        test_neg_path_list+=path_mask                
             readfile.close()
+
         #store each folder
         train_pos_ents_matrix_folders.append(train_pos_ents_matrix)
         train_pos_rels_matrix_folders.append(train_pos_rels_matrix)
         train_pos_masks_matrix_folders.append(train_pos_masks_matrix)
+        train_pos_path_masks_folders.append(train_pos_path_list)
 
         train_neg_ents_matrix_folders.append(train_neg_ents_matrix)
         train_neg_rels_matrix_folders.append(train_neg_rels_matrix)
         train_neg_masks_matrix_folders.append(train_neg_masks_matrix)
+        train_neg_path_masks_folders.append(train_neg_path_list)
 
         test_pos_ents_matrix_folders.append(test_pos_ents_matrix)
         test_pos_rels_matrix_folders.append(test_pos_rels_matrix)
         test_pos_masks_matrix_folders.append(test_pos_masks_matrix)
+        test_pos_path_masks_folders.append(test_pos_path_list)
 
         test_neg_ents_matrix_folders.append(test_neg_ents_matrix)
         test_neg_rels_matrix_folders.append(test_neg_rels_matrix)
         test_neg_masks_matrix_folders.append(test_neg_masks_matrix)
+        test_neg_path_masks_folders.append(test_neg_path_list)
 
-            # print '\t\t\t\tload over, overall ',    len(train_paths_store), ' train,', len(dev_paths_store), ' dev,', len(test_paths_store), ' test'
+    print '\t\t\t\tload over, max_path_size',    max_path_size, 'min_path_size:', min_path_size
 #     print train_pos_rels_matrix_folders[0]
 #     exit(0)
-    return     [[train_pos_rels_matrix_folders, train_pos_masks_matrix_folders,train_pos_ents_matrix_folders],
-        [train_neg_rels_matrix_folders, train_neg_masks_matrix_folders, train_neg_ents_matrix_folders],
-        [test_pos_rels_matrix_folders, test_pos_masks_matrix_folders, test_pos_ents_matrix_folders],
-        [test_neg_rels_matrix_folders, test_neg_masks_matrix_folders, test_neg_ents_matrix_folders]], target_rels_list, relation_str2id, entity_str2id, relation_id2wordlist, tuple2tailset, rel2tailset, ent2relset, ent2relset_maxSetSize
+    return     [[train_pos_rels_matrix_folders, train_pos_masks_matrix_folders,train_pos_ents_matrix_folders, train_pos_path_masks_folders],
+        [train_neg_rels_matrix_folders, train_neg_masks_matrix_folders, train_neg_ents_matrix_folders, train_neg_path_masks_folders],
+        [test_pos_rels_matrix_folders, test_pos_masks_matrix_folders, test_pos_ents_matrix_folders, test_pos_path_masks_folders],
+        [test_neg_rels_matrix_folders, test_neg_masks_matrix_folders, test_neg_ents_matrix_folders, test_neg_path_masks_folders]], target_rels_list, relation_str2id, entity_str2id, relation_id2wordlist, tuple2tailset, rel2tailset, ent2relset, ent2relset_maxSetSize
 
 
 if __name__ == '__main__':
