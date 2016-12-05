@@ -53,7 +53,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_per
     test_neg=corpus[3]
     test_neg_rels_matrix_folders=test_neg[0]
     test_neg_masks_matrix_folders=test_neg[1]
-    test_neg_ents_matrix_folders=test_neg[2]
+#     test_neg_ents_matrix_folders=test_neg[2]
     test_neg_path_masks_folders=test_neg[3]
 
     folder_size=len(train_pos_rels_matrix_folders)
