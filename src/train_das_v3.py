@@ -17,7 +17,7 @@ from random import shuffle
 from preprocess import rel_idmatrix_to_word2vec_init, rel_idlist_to_word2vec_init, load_das_v2, compute_map, rel_id_to_word2vec_init
 from preprocess_socher_guu import load_guu_data, load_all_triples_inIDs, neg_entity_tensor, load_guu_data_v2, neg_entity_tensor_v2
 from common_functions import store_model_to_file, load_model_from_file, create_conv_para, cosine_tensor3_tensor4, rmsprop, cosine_tensors, Adam, GRU_Batch_Tensor_Input_with_Mask_with_MatrixInit, Conv_with_input_para, LSTM_Batch_Tensor_Input_with_Mask, create_ensemble_para, L2norm_paraList, Diversify_Reg, create_GRU_para, GRU_Batch_Tensor_Input_with_Mask, create_LSTM_para, load_word2vec
-def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_performance=50.0,rel_emb_size=200, margin1=0.5, margin2=0.5, ent_emb_size=30, batch_size=20, maxPathLen=8, neg_size=4, path_size=30):
+def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_performance=74.0,rel_emb_size=200, margin1=0.5, margin2=0.5, ent_emb_size=30, batch_size=20, maxPathLen=8, neg_size=4, path_size=30):
     model_options = locals().copy()
     print "model options", model_options
 
@@ -131,9 +131,9 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_per
 
     #cosine with target rela
     pos_path_reps_tensor3=pos_pred_last_ents.reshape((input_batch_size, path_size, rel_emb_size))
-    pos_cos_rel2path=cosine_tensors(pos_path_reps_tensor3.dimshuffle(0,2,1), target_rel_reps_tensor3.dimshuffle(0,2,1)) #(batch, len)
+    pos_cos_rel2path=cosine_tensors(pos_path_reps_tensor3.dimshuffle(0,2,1), target_rel_reps_tensor3.dimshuffle(0,2,1)) #(batch, path_size)
     mask_pos_cos_rel2path=T.exp(pos_cos_rel2path)#pos_pathPad_mask.reshape((input_batch_size, path_size))*
-    pos_batch_cosine=T.nnet.sigmoid(T.log(T.sum(mask_pos_cos_rel2path, axis=1))) # (batch, 1))
+    pos_batch_cosine=T.nnet.sigmoid(T.log(T.max(mask_pos_cos_rel2path, axis=1))) # (batch, 1))
 
 
     #neg
@@ -161,9 +161,9 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_per
 
     #cosine with target rela
     neg_path_reps_tensor3=neg_pred_last_ents.reshape((input_batch_size, path_size, rel_emb_size))
-    neg_cos_rel2path=cosine_tensors(neg_path_reps_tensor3.dimshuffle(0,2,1), target_rel_reps_tensor3.dimshuffle(0,2,1)) #(batch, len)
+    neg_cos_rel2path=cosine_tensors(neg_path_reps_tensor3.dimshuffle(0,2,1), target_rel_reps_tensor3.dimshuffle(0,2,1)) #(batch, path_size)
     mask_neg_cos_rel2path=T.exp(neg_cos_rel2path) #neg_pathPad_mask.reshape((input_batch_size, path_size))*
-    neg_batch_cosine=T.nnet.sigmoid(T.log(T.sum(mask_neg_cos_rel2path, axis=1)))
+    neg_batch_cosine=T.nnet.sigmoid(T.log(T.max(mask_neg_cos_rel2path, axis=1)))
 
     pos_batch_cosine_matrix=T.repeat(pos_batch_cosine.dimshuffle(0,'x'), input_batch_size, axis=1)  #(batch, batch)
     neg_batch_cosine_matrix=T.repeat(neg_batch_cosine.dimshuffle('x', 0), input_batch_size, axis=0)  #(batch, batch)
@@ -397,7 +397,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_per
                         if aver_map > max_acc:
                             max_acc=aver_map
                             if max_acc > max_performance:
-                                store_model_to_file(rootPath+'Best_Paras_v2_'+str(max_acc), params)
+                                store_model_to_file(rootPath+'Best_Paras_v3_'+str(max_acc), params)
                                 print 'Finished storing best  params at:', max_acc
                         print 'current map:', aver_map, '\t\t\t\t\tmax map:', max_acc
 
