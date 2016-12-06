@@ -412,7 +412,6 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_per
         print 'Epoch ', epoch, 'uses ', (time.time()-mid_time)/60.0, 'min'
         mid_time = time.time()
 
-        #print 'Batch_size: ', update_freq
     end_time = time.time()
     print('Optimization complete.')
 
