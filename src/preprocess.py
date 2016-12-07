@@ -229,7 +229,30 @@ def rel_id_to_word2vec_init(id, id2wordlist, word2vec, dim):
     sum_emb=numpy.sum(numpy.asarray(emb_list), axis=0)
             
     return sum_emb #(len, emb_size)
+def rel_wordlist_to_word2vec_init(wordlist, word2vec, dim):
+    zero_emb=list(numpy.zeros(dim))
 
+    emb_list=[]
+#     wordlist=id2wordlist.get(id)
+#     if wordlist is None:
+#         print 'wordlist is None'
+#         exit(0)
+    for word in wordlist:
+        emb=word2vec.get(word)
+        if emb is not None:
+            emb_list.append(emb)
+    if len(emb_list)==0:
+        emb_list.append(zero_emb)
+    sum_emb=numpy.sum(numpy.asarray(emb_list), axis=0)
+            
+    return sum_emb #(len, emb_size)
+def load_word2vec_to_init_rels(rel_w2v_values, rel_id2wordlist, word2vec, dim):
+    for id, wordlist in rel_id2wordlist.iteritems():
+        emb=rel_wordlist_to_word2vec_init(wordlist, word2vec, dim)
+        rel_w2v_values[id]=emb
+    print 'Using word2vec init rels finished.'
+    return rel_w2v_values
+    
 def ent2relSet_pad(ent_size, ent2relset, maxSetSize):
     idvector=[]
     maskvector=[]
