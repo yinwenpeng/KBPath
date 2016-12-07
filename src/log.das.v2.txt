@@ -1,0 +1,358 @@
+Using gpu device 1: GeForce GTX 1080 (CNMeM is disabled, cuDNN 5005)
+/opt/anaconda2/lib/python2.7/site-packages/theano/tensor/signal/downsample.py:6: UserWarning: downsample module has been moved to the theano.tensor.signal.pool module.
+  "downsample module has been moved to the theano.tensor.signal.pool module.")
+model options {'ent_emb_size': 200, 'path_size': 30, 'maxPathLen': 8, 'batch_size': 20, 'n_epochs': 2000, 'margin1': 0.5, 'rel_emb_size': 200, 'max_performance': 74.0, 'L2_weight': 1e-05, 'margin2': 0.5, 'learning_rate': 0.1, 'neg_size': 4}
+loading _architecture_structure_address/positive_matrix.tsv.translated ...
+loading _architecture_structure_address/negative_matrix.tsv.translated ...
+loading _architecture_structure_address/test_matrix.tsv.translated ...
+				load over, max_path_size 580 min_path_size: 1
+True folder_size: 1
+entity size: 148522 relation size: 22530
+... building the model
+... training
+Epoch  1 iter 5 average cost: 0.539317649603 uses  0.393205030759 min
+current map: 47.6752665198 					max map: 47.6752665198
+Epoch  1 iter 10 average cost: 0.470387640595 uses  0.689457317193 min
+current map: 66.1908255554 					max map: 66.1908255554
+Epoch  1 iter 15 average cost: 0.41579079628 uses  0.676563584805 min
+current map: 73.973234177 					max map: 73.973234177
+Epoch  1 iter 20 average cost: 0.377857970446 uses  0.673503148556 min
+Finished storing best  params at: 74.1666414202
+current map: 74.1666414202 					max map: 74.1666414202
+Epoch  1 iter 25 average cost: 0.360461595058 uses  0.700313985348 min
+current map: 74.1346650515 					max map: 74.1666414202
+Epoch  1 iter 30 average cost: 0.354799550275 uses  0.667731066545 min
+Finished storing best  params at: 74.2049950461
+current map: 74.2049950461 					max map: 74.2049950461
+Epoch  1 iter 35 average cost: 0.347810145787 uses  0.685306282838 min
+current map: 74.058736878 					max map: 74.2049950461
+Epoch  1 iter 40 average cost: 0.340063868836 uses  0.662628201644 min
+current map: 74.1208966881 					max map: 74.2049950461
+Epoch  1 iter 45 average cost: 0.332678813405 uses  0.643540116151 min
+Finished storing best  params at: 74.2084696511
+current map: 74.2084696511 					max map: 74.2084696511
+Epoch  1 iter 50 average cost: 0.324319496751 uses  0.672997065385 min
+Finished storing best  params at: 74.2382286251
+current map: 74.2382286251 					max map: 74.2382286251
+Epoch  1 iter 55 average cost: 0.3183394237 uses  0.674861915906 min
+Finished storing best  params at: 74.2383524571
+current map: 74.2383524571 					max map: 74.2383524571
+Epoch  1 iter 60 average cost: 0.314731495082 uses  0.672435832024 min
+current map: 74.2002892927 					max map: 74.2383524571
+Epoch  1 iter 65 average cost: 0.309984358687 uses  0.652427168687 min
+current map: 74.1758346112 					max map: 74.2383524571
+Epoch  1 iter 70 average cost: 0.306616490441 uses  0.6469739 min
+current map: 74.1769985732 					max map: 74.2383524571
+Epoch  1 iter 75 average cost: 0.303667403261 uses  0.643855416775 min
+current map: 74.1398549315 					max map: 74.2383524571
+Epoch  1 iter 80 average cost: 0.30157311745 uses  0.645678333441 min
+current map: 74.1801233961 					max map: 74.2383524571
+Epoch  1 iter 85 average cost: 0.29986500442 uses  0.644569281737 min
+current map: 74.1733602826 					max map: 74.2383524571
+Epoch  1 iter 90 average cost: 0.297659506069 uses  0.658035202821 min
+current map: 74.1746611596 					max map: 74.2383524571
+Epoch  1 iter 95 average cost: 0.294254199298 uses  0.638444765409 min
+current map: 74.1761253966 					max map: 74.2383524571
+Epoch  1 iter 100 average cost: 0.291805432439 uses  0.652671384811 min
+current map: 74.2025195587 					max map: 74.2383524571
+Epoch  1 iter 105 average cost: 0.287415599965 uses  0.641021263599 min
+current map: 74.1757014447 					max map: 74.2383524571
+Epoch  1 iter 110 average cost: 0.285362895781 uses  0.636429953575 min
+current map: 74.1910249986 					max map: 74.2383524571
+Epoch  1 iter 115 average cost: 0.283143194085 uses  0.643177298705 min
+current map: 74.1268870172 					max map: 74.2383524571
+Epoch  1 iter 120 average cost: 0.283220246807 uses  0.639641984304 min
+current map: 74.1035847877 					max map: 74.2383524571
+Epoch  1 iter 125 average cost: 0.282866557837 uses  0.645306750139 min
+current map: 73.2772500431 					max map: 74.2383524571
+Epoch  1 iter 130 average cost: 0.281711598085 uses  0.635500335693 min
+current map: 74.0357332761 					max map: 74.2383524571
+Epoch  1 iter 135 average cost: 0.281025122492 uses  0.642668497562 min
+current map: 74.0681888733 					max map: 74.2383524571
+Epoch  1 iter 140 average cost: 0.280320357425 uses  0.648316399256 min
+current map: 74.0252839128 					max map: 74.2383524571
+Epoch  1 iter 145 average cost: 0.277947382886 uses  0.640501113733 min
+current map: 74.0686942606 					max map: 74.2383524571
+Epoch  1 iter 150 average cost: 0.277908882697 uses  0.646348448594 min
+current map: 74.0407226105 					max map: 74.2383524571
+Epoch  1 iter 155 average cost: 0.275962224218 uses  0.647073801359 min
+current map: 74.1137996149 					max map: 74.2383524571
+Epoch  1 iter 160 average cost: 0.275286471099 uses  0.647304165363 min
+current map: 74.0723518758 					max map: 74.2383524571
+Epoch  1 iter 165 average cost: 0.273051158316 uses  0.648121436437 min
+current map: 74.0700715885 					max map: 74.2383524571
+Epoch  1 iter 170 average cost: 0.272725090998 uses  0.643731649717 min
+current map: 74.0338387452 					max map: 74.2383524571
+Epoch  1 iter 175 average cost: 0.271495848213 uses  0.648308749994 min
+current map: 74.1154340991 					max map: 74.2383524571
+Epoch  1 iter 180 average cost: 0.270629568481 uses  0.640828148524 min
+current map: 74.0199682692 					max map: 74.2383524571
+Epoch  1 iter 185 average cost: 0.269488300262 uses  0.653158696493 min
+current map: 74.0485156958 					max map: 74.2383524571
+Epoch  1 iter 190 average cost: 0.269359816689 uses  0.648049716155 min
+current map: 74.0428101614 					max map: 74.2383524571
+Epoch  1 iter 195 average cost: 0.269001486515 uses  0.643605299791 min
+current map: 74.011815873 					max map: 74.2383524571
+Epoch  1 iter 200 average cost: 0.266891837865 uses  0.64098003308 min
+current map: 74.053859484 					max map: 74.2383524571
+Epoch  1 iter 205 average cost: 0.266450090088 uses  0.641886385282 min
+current map: 74.0557814185 					max map: 74.2383524571
+Epoch  1 iter 210 average cost: 0.265539948855 uses  0.639184848468 min
+current map: 73.9987557318 					max map: 74.2383524571
+Epoch  1 iter 215 average cost: 0.265047803798 uses  0.641300018628 min
+current map: 74.0146051239 					max map: 74.2383524571
+Epoch  1 iter 220 average cost: 0.264460286634 uses  0.651075867812 min
+current map: 74.0151900062 					max map: 74.2383524571
+Epoch  1 iter 225 average cost: 0.263369001879 uses  0.643702634176 min
+current map: 74.0190237534 					max map: 74.2383524571
+Epoch  1 iter 230 average cost: 0.262721268055 uses  0.644650050004 min
+current map: 74.1273120172 					max map: 74.2383524571
+Epoch  1 iter 235 average cost: 0.261560033737 uses  0.653477235635 min
+current map: 74.1315943012 					max map: 74.2383524571
+Epoch  1 iter 240 average cost: 0.260978551582 uses  0.642510219415 min
+current map: 74.0772837617 					max map: 74.2383524571
+Epoch  1 iter 245 average cost: 0.259655214572 uses  0.638512333234 min
+current map: 74.0657212744 					max map: 74.2383524571
+Epoch  1 iter 250 average cost: 0.258798525453 uses  0.63971243302 min
+current map: 74.0475990826 					max map: 74.2383524571
+Epoch  1 iter 255 average cost: 0.258394623212 uses  0.651381067435 min
+current map: 74.0714057691 					max map: 74.2383524571
+Epoch  1 iter 260 average cost: 0.257742845554 uses  0.647691452503 min
+current map: 74.0512921661 					max map: 74.2383524571
+Epoch  1 iter 265 average cost: 0.257411189743 uses  0.641387832165 min
+current map: 74.0847004114 					max map: 74.2383524571
+Epoch  1 iter 270 average cost: 0.257096675204 uses  0.648486169179 min
+current map: 74.0579169678 					max map: 74.2383524571
+Epoch  1 iter 275 average cost: 0.255905572339 uses  0.643576967716 min
+current map: 74.015688606 					max map: 74.2383524571
+Epoch  1 iter 280 average cost: 0.255383536432 uses  0.637881616751 min
+current map: 74.1110058851 					max map: 74.2383524571
+Epoch  1 iter 285 average cost: 0.25470044456 uses  0.643491399288 min
+current map: 74.069800539 					max map: 74.2383524571
+Epoch  1 iter 290 average cost: 0.254305579796 uses  0.6438266476 min
+current map: 74.0728586974 					max map: 74.2383524571
+Epoch  1 iter 295 average cost: 0.254274121988 uses  0.646691469351 min
+current map: 74.0431664528 					max map: 74.2383524571
+Epoch  1 iter 300 average cost: 0.254046858251 uses  0.636543297768 min
+current map: 74.0495426036 					max map: 74.2383524571
+Epoch  1 iter 305 average cost: 0.254146518082 uses  0.645664636294 min
+current map: 74.0775345049 					max map: 74.2383524571
+Epoch  1 iter 310 average cost: 0.253684782453 uses  0.641831231117 min
+current map: 74.0580477665 					max map: 74.2383524571
+Epoch  1 iter 315 average cost: 0.253089838605 uses  0.641119619211 min
+current map: 74.0407620666 					max map: 74.2383524571
+Epoch  1 iter 320 average cost: 0.252375802258 uses  0.645716349284 min
+current map: 74.0354187838 					max map: 74.2383524571
+Epoch  1 iter 325 average cost: 0.251661633803 uses  0.646408983072 min
+current map: 74.0905336023 					max map: 74.2383524571
+Epoch  1 iter 330 average cost: 0.251176076247 uses  0.636306099097 min
+current map: 74.1332170954 					max map: 74.2383524571
+Epoch  1 iter 335 average cost: 0.250734482884 uses  0.647450999419 min
+current map: 74.1338558858 					max map: 74.2383524571
+Epoch  1 iter 340 average cost: 0.250569980438 uses  0.642455951373 min
+current map: 74.1538751497 					max map: 74.2383524571
+Epoch  1 iter 345 average cost: 0.250222553745 uses  0.643633965651 min
+current map: 74.0833274052 					max map: 74.2383524571
+Epoch  1 iter 350 average cost: 0.2497163085 uses  0.639816017946 min
+current map: 74.0787322142 					max map: 74.2383524571
+Epoch  1 iter 355 average cost: 0.250604005725 uses  0.611615133286 min
+current map: 73.9709779752 					max map: 74.2383524571
+Epoch  1 iter 360 average cost: 0.251541580591 uses  0.617335681121 min
+current map: 73.934849121 					max map: 74.2383524571
+Epoch  1 iter 365 average cost: 0.251839027054 uses  0.615774432818 min
+current map: 73.9395273238 					max map: 74.2383524571
+Epoch  1 iter 370 average cost: 0.252073958879 uses  0.620888169607 min
+current map: 73.950652456 					max map: 74.2383524571
+Epoch  1 iter 375 average cost: 0.252220275958 uses  0.613877884547 min
+current map: 73.9679665854 					max map: 74.2383524571
+Epoch  1 iter 380 average cost: 0.25324320699 uses  0.624009648959 min
+current map: 73.7375043902 					max map: 74.2383524571
+Epoch  1 iter 385 average cost: 0.253773450658 uses  0.617665934563 min
+current map: 73.9850935139 					max map: 74.2383524571
+Epoch  1 iter 390 average cost: 0.253907716312 uses  0.620555416743 min
+current map: 73.9081948138 					max map: 74.2383524571
+Epoch  1 iter 395 average cost: 0.254273434794 uses  0.62165693442 min
+current map: 74.0905429228 					max map: 74.2383524571
+Epoch  1 iter 400 average cost: 0.254209469706 uses  0.623954133193 min
+current map: 74.0718106006 					max map: 74.2383524571
+Epoch  1 iter 405 average cost: 0.254450310233 uses  0.616687818368 min
+current map: 73.8587980046 					max map: 74.2383524571
+Epoch  1 iter 410 average cost: 0.25466536945 uses  0.622873016198 min
+current map: 73.8920038569 					max map: 74.2383524571
+Epoch  1 iter 415 average cost: 0.254903465868 uses  0.616624216239 min
+current map: 73.9073879113 					max map: 74.2383524571
+Epoch  1 iter 420 average cost: 0.255137222367 uses  0.615781366825 min
+current map: 73.8783920608 					max map: 74.2383524571
+Epoch  1 iter 425 average cost: 0.255444926479 uses  0.651757884026 min
+current map: 73.8948853219 					max map: 74.2383524571
+Epoch  1 iter 430 average cost: 0.255909335059 uses  0.623363685608 min
+current map: 73.8848116991 					max map: 74.2383524571
+Epoch  1 iter 435 average cost: 0.256214971309 uses  0.617688767115 min
+current map: 73.9343120177 					max map: 74.2383524571
+Epoch  1 iter 440 average cost: 0.256395799396 uses  0.619477832317 min
+current map: 73.8806156152 					max map: 74.2383524571
+Epoch  1 iter 445 average cost: 0.256436973643 uses  0.61770863533 min
+current map: 73.9068270166 					max map: 74.2383524571
+Epoch  1 iter 450 average cost: 0.256264072723 uses  0.62534408172 min
+current map: 73.8542783704 					max map: 74.2383524571
+Epoch  1 iter 455 average cost: 0.25597794462 uses  0.621660800775 min
+current map: 74.0496106468 					max map: 74.2383524571
+Epoch  1 iter 460 average cost: 0.256092166998 uses  0.612568247318 min
+current map: 74.032412543 					max map: 74.2383524571
+Epoch  1 iter 465 average cost: 0.256160496544 uses  0.616452598572 min
+current map: 74.0200469915 					max map: 74.2383524571
+Epoch  1 iter 470 average cost: 0.256878558911 uses  0.621203581492 min
+current map: 73.8855831206 					max map: 74.2383524571
+Epoch  1 iter 475 average cost: 0.257172441294 uses  0.625185183684 min
+current map: 73.8473008837 					max map: 74.2383524571
+Epoch  1 iter 480 average cost: 0.257033213476 uses  0.623628966014 min
+current map: 73.9830820291 					max map: 74.2383524571
+Epoch  1 iter 485 average cost: 0.257167912759 uses  0.608760285378 min
+current map: 73.7499878689 					max map: 74.2383524571
+Epoch  1 iter 490 average cost: 0.257352867358 uses  0.62877070109 min
+current map: 74.0129344981 					max map: 74.2383524571
+Epoch  1 iter 495 average cost: 0.25715848641 uses  0.62337376674 min
+current map: 74.0399979407 					max map: 74.2383524571
+Epoch  1 iter 500 average cost: 0.257535703331 uses  0.622192831834 min
+current map: 74.0446372276 					max map: 74.2383524571
+Epoch  1 iter 505 average cost: 0.257379711146 uses  0.630522068342 min
+current map: 74.0220407456 					max map: 74.2383524571
+Epoch  1 iter 510 average cost: 0.257612701462 uses  0.620930031935 min
+current map: 74.0694051203 					max map: 74.2383524571
+Epoch  1 iter 515 average cost: 0.257227763013 uses  0.62379455169 min
+current map: 74.0197517176 					max map: 74.2383524571
+Epoch  1 iter 520 average cost: 0.25758332335 uses  0.626587414742 min
+current map: 74.0388362119 					max map: 74.2383524571
+Epoch  1 iter 525 average cost: 0.25747591382 uses  0.616819067796 min
+current map: 73.9938440346 					max map: 74.2383524571
+Epoch  1 iter 530 average cost: 0.257513544554 uses  0.621932665507 min
+current map: 74.0025543581 					max map: 74.2383524571
+Epoch  1 iter 535 average cost: 0.25751844937 uses  0.615440165997 min
+current map: 74.0292528169 					max map: 74.2383524571
+Epoch  1 iter 540 average cost: 0.257851341256 uses  0.621788998445 min
+current map: 74.0073284199 					max map: 74.2383524571
+Epoch  1 iter 545 average cost: 0.257963836494 uses  0.628852534294 min
+current map: 74.0376856339 					max map: 74.2383524571
+Epoch  1 iter 550 average cost: 0.257720586116 uses  0.613790448507 min
+current map: 74.0599692941 					max map: 74.2383524571
+Epoch  1 iter 555 average cost: 0.257922239561 uses  0.622168000539 min
+current map: 74.0330766608 					max map: 74.2383524571
+Epoch  1 iter 560 average cost: 0.257802547248 uses  0.619551253319 min
+current map: 73.9948850188 					max map: 74.2383524571
+Epoch  1 iter 565 average cost: 0.257989929181 uses  0.616444647312 min
+current map: 74.032697725 					max map: 74.2383524571
+Epoch  1 iter 570 average cost: 0.258011346768 uses  0.625373319785 min
+current map: 73.9742750813 					max map: 74.2383524571
+Epoch  1 iter 575 average cost: 0.25803439288 uses  0.617847518126 min
+current map: 74.0403941882 					max map: 74.2383524571
+Epoch  1 iter 580 average cost: 0.258005408763 uses  0.630272948742 min
+current map: 74.0198473205 					max map: 74.2383524571
+Epoch  1 iter 585 average cost: 0.258036585445 uses  0.622968085607 min
+current map: 73.993939358 					max map: 74.2383524571
+Epoch  1 iter 590 average cost: 0.258018603769 uses  0.614583782355 min
+current map: 74.0844479243 					max map: 74.2383524571
+Epoch  1 iter 595 average cost: 0.25778353938 uses  0.626146018505 min
+current map: 74.0996036309 					max map: 74.2383524571
+Epoch  1 iter 600 average cost: 0.25770990558 uses  0.621547996998 min
+current map: 74.1245414802 					max map: 74.2383524571
+Epoch  1 iter 605 average cost: 0.257888292823 uses  0.635724933942 min
+current map: 74.0928151641 					max map: 74.2383524571
+Epoch  1 iter 610 average cost: 0.25784814988 uses  0.624296581745 min
+current map: 74.1026446653 					max map: 74.2383524571
+Epoch  1 iter 615 average cost: 0.257884159999 uses  0.623982814948 min
+current map: 74.1118787464 					max map: 74.2383524571
+Epoch  1 iter 620 average cost: 0.258067996704 uses  0.620353913307 min
+current map: 74.1206569187 					max map: 74.2383524571
+Epoch  1 iter 625 average cost: 0.257674671316 uses  0.621667881807 min
+current map: 74.0955159505 					max map: 74.2383524571
+Epoch  1 iter 630 average cost: 0.25767635748 uses  0.624289083481 min
+current map: 74.1192451339 					max map: 74.2383524571
+Epoch  1 iter 635 average cost: 0.257707807844 uses  0.627138833205 min
+current map: 74.1408460837 					max map: 74.2383524571
+Epoch  1 iter 640 average cost: 0.257790146372 uses  0.62304935058 min
+current map: 74.1426335829 					max map: 74.2383524571
+Epoch  1 iter 645 average cost: 0.257908125487 uses  0.623696053028 min
+current map: 74.0949059539 					max map: 74.2383524571
+Epoch  1 iter 650 average cost: 0.258231004591 uses  0.628974334399 min
+current map: 74.050164107 					max map: 74.2383524571
+Epoch  1 iter 655 average cost: 0.258432136715 uses  0.626348483562 min
+current map: 74.0812441375 					max map: 74.2383524571
+Epoch  1 iter 660 average cost: 0.258290776272 uses  0.628058481216 min
+current map: 74.0664091447 					max map: 74.2383524571
+Epoch  1 iter 665 average cost: 0.258152463248 uses  0.619164482752 min
+current map: 74.0941636166 					max map: 74.2383524571
+Epoch  1 iter 670 average cost: 0.258077195576 uses  0.635563349724 min
+current map: 74.10125214 					max map: 74.2383524571
+Epoch  1 iter 675 average cost: 0.257831716847 uses  0.623526533445 min
+current map: 74.0709641751 					max map: 74.2383524571
+Epoch  1 iter 680 average cost: 0.257854734186 uses  0.62067476511 min
+current map: 74.1244287057 					max map: 74.2383524571
+Epoch  1 iter 685 average cost: 0.257907044148 uses  0.699838550886 min
+current map: 74.1500895045 					max map: 74.2383524571
+Epoch  1 iter 690 average cost: 0.257954023649 uses  0.703757282098 min
+current map: 74.1684850987 					max map: 74.2383524571
+Epoch  1 iter 695 average cost: 0.25806271719 uses  0.705879032612 min
+current map: 74.1299316947 					max map: 74.2383524571
+Epoch  1 iter 700 average cost: 0.257959962658 uses  0.699240334829 min
+current map: 71.4110728942 					max map: 74.2383524571
+Epoch  1 iter 705 average cost: 0.257995955699 uses  0.700281163057 min
+current map: 74.099152114 					max map: 74.2383524571
+Epoch  1 iter 710 average cost: 0.258030148102 uses  0.708968480428 min
+current map: 74.1073995149 					max map: 74.2383524571
+Epoch  1 iter 715 average cost: 0.25767208342 uses  0.70623648564 min
+current map: 74.1643971464 					max map: 74.2383524571
+Epoch  1 iter 720 average cost: 0.257402592711 uses  0.715412350496 min
+current map: 74.1798536384 					max map: 74.2383524571
+Epoch  1 iter 725 average cost: 0.257322059664 uses  0.706623148918 min
+current map: 71.475324077 					max map: 74.2383524571
+Epoch  1 iter 730 average cost: 0.257449219304 uses  0.709716681639 min
+current map: 71.2505665119 					max map: 74.2383524571
+Epoch  1 iter 735 average cost: 0.25737982737 uses  0.707782264551 min
+current map: 71.2373205557 					max map: 74.2383524571
+Epoch  1 iter 740 average cost: 0.257034329989 uses  0.698468919595 min
+current map: 71.4387152223 					max map: 74.2383524571
+Epoch  1 iter 745 average cost: 0.256785827895 uses  0.712369986375 min
+current map: 71.454832213 					max map: 74.2383524571
+Epoch  1 iter 750 average cost: 0.25630890123 uses  0.702674651146 min
+current map: 71.2704144409 					max map: 74.2383524571
+Epoch  1 iter 755 average cost: 0.256143105662 uses  0.712222516537 min
+current map: 71.1536881336 					max map: 74.2383524571
+Epoch  1 iter 760 average cost: 0.255813602221 uses  0.707661283016 min
+current map: 71.1289948461 					max map: 74.2383524571
+Epoch  1 iter 765 average cost: 0.255328612741 uses  0.712502018611 min
+current map: 71.3244431162 					max map: 74.2383524571
+Epoch  1 iter 770 average cost: 0.255095916677 uses  0.712040698528 min
+current map: 71.2056380038 					max map: 74.2383524571
+Epoch  1 iter 775 average cost: 0.254735473048 uses  0.703216648102 min
+current map: 71.2255553843 					max map: 74.2383524571
+Epoch  1 iter 780 average cost: 0.25435161325 uses  0.70889998277 min
+current map: 71.2996824381 					max map: 74.2383524571
+Epoch  1 iter 785 average cost: 0.253994601035 uses  0.708569916089 min
+current map: 71.2032176099 					max map: 74.2383524571
+Epoch  1 iter 790 average cost: 0.253390835791 uses  0.714302051067 min
+current map: 71.2397834797 					max map: 74.2383524571
+Epoch  1 iter 795 average cost: 0.252734152701 uses  0.701904133956 min
+current map: 69.3054739297 					max map: 74.2383524571
+Epoch  1 iter 800 average cost: 0.251978050526 uses  0.705697464943 min
+current map: 69.417603843 					max map: 74.2383524571
+Epoch  1 iter 805 average cost: 0.251265516405 uses  0.706040517489 min
+current map: 69.4884500318 					max map: 74.2383524571
+Epoch  1 iter 810 average cost: 0.25054750368 uses  0.709329001109 min
+current map: 69.4839362689 					max map: 74.2383524571
+Epoch  1 iter 815 average cost: 0.249907785508 uses  0.710997064908 min
+current map: 69.3645102752 					max map: 74.2383524571
+Epoch  1 iter 820 average cost: 0.249503920146 uses  0.704168001811 min
+current map: 70.3448352812 					max map: 74.2383524571
+Epoch  1 iter 825 average cost: 0.248994062778 uses  0.699356714884 min
+current map: 71.5425642201 					max map: 74.2383524571
+Epoch  1 iter 830 average cost: 0.248297888579 uses  0.704525367419 min
+current map: 69.6480138083 					max map: 74.2383524571
+Epoch  1 iter 835 average cost: 0.247556782367 uses  0.699350400766 min
+current map: 69.6609047344 					max map: 74.2383524571
+Epoch  1 iter 840 average cost: 0.246839664939 uses  0.707707818349 min
+current map: 69.584378929 					max map: 74.2383524571
+Epoch  1 iter 845 average cost: 0.246086554741 uses  0.708808902899 min
+current map: 69.5813742907 					max map: 74.2383524571
+Epoch  1 iter 850 average cost: 0.245467302484 uses  0.708597815037 min
+current map: 69.5305516731 					max map: 74.2383524571
+Epoch  1 iter 855 average cost: 0.24470157307 uses  0.71187513272 min
