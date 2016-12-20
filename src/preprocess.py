@@ -770,7 +770,7 @@ def load_das_v2(maxPathLen=20, path_size=10):
     max_path_size=0
     min_path_size=1000000
 
-    for folder in folders[:1]:  #train a separate model for each folder
+    for folder in folders[1:2]:  #train a separate model for each folder
         target_rel=replacePunctuationsInStrByUnderline(folder).strip()
         target_rel_id=relation_str2id.get(target_rel)
         if target_rel_id is None:
