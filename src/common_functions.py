@@ -392,6 +392,24 @@ class GRU_OneStep_Matrix_Input(object):
 
         self.matrix=s_t1.T 
 
+class GRU_OneStep_MatrixInit_Tensor3Input(object):
+    def __init__(self, X, MatrixInit, hidden_dim, U, W, b):
+        #now, X is (batch, emb_size, len)
+        #MatrixInit (batch, hidden)
+        #U[0] (hidden ,word)
+        
+        x_t=X.dimshuffle(0,2,1).reshape((X.shape[0]*X.shape[2], X.shape[1])).T #(emb_size, batch*len)
+#         s_t1_prev=T.repeat(MatrixInit.dimshuffle('x',0,1), X.shape[2], axis=0).reshape((MatrixInit.shape[0]*X.shape[2], MatrixInit.shape[1])).T  #(hidden_size, batch*len)
+        s_t1_prev=T.repeat(MatrixInit, X.shape[2], axis=0).T #(hidden_size, batch*len)
+        
+        z_t1 =T.nnet.sigmoid(U[0].dot(x_t) + W[0].dot(s_t1_prev) + b[0].dimshuffle(0,'x')) #maybe here has a bug, as b is vector while dot product is matrix
+        r_t1 = T.nnet.sigmoid(U[1].dot(x_t) + W[1].dot(s_t1_prev) + b[1].dimshuffle(0,'x'))
+        c_t1 = T.tanh(U[2].dot(x_t) + W[2].dot(s_t1_prev * r_t1) + b[2].dimshuffle(0,'x'))
+        s_t1 = (T.ones_like(z_t1) - z_t1) * c_t1 + z_t1 * s_t1_prev  #(hidden, batch*len)
+
+
+
+        self.tensor3=s_t1.T.reshape((X.shape[0], X.shape[2], hidden_dim)).dimshuffle(0,2,1) #(batch, hidden ,len)
 class GRU_Batch_Tensor_Input_with_Mask_with_MatrixInit(object):
     def __init__(self, X, Mask, MatrixInit, hidden_dim, U, W, b):
         #now, X is (batch, emb_size, sentlength)
@@ -1537,9 +1555,9 @@ def strs2ids(str_list, word2id):
 def load_word2vec():
     word2vec = {}
 
-    print "==> loading 300d word2vec"
+    print "==> loading 300d glove"
 #     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/glove/glove.6B." + str(dim) + "d.txt")) as f:
-    f=open('/mounts/data/proj/wenpeng/Dataset/word2vec_words_300d.txt', 'r')
+    f=open('/mounts/data/proj/wenpeng/Dataset/word2vec_words_300d.txt', 'r') #word2vec_words_300d.txt
     for line in f:
         l = line.split()
         word2vec[l[0]] = map(float, l[1:])
