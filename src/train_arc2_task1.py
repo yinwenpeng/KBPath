@@ -16,7 +16,7 @@ from theano.tensor.signal import downsample
 from random import shuffle
 from preprocess import rel_idmatrix_to_word2vec_init, rel_idlist_to_word2vec_init, load_word2vec_to_init_rels
 from preprocess_socher_guu import load_guu_data, load_all_triples_inIDs, neg_entity_tensor, load_guu_data_v2, neg_entity_tensor_v2
-from common_functions import store_model_to_file, load_model_from_file, GRU_OneStep_MatrixInit_Tensor3Input, cosine_tensor3_tensor4, rmsprop, cosine_tensors, Adam, GRU_Batch_Tensor_Input_with_Mask_with_MatrixInit, Conv_with_input_para, LSTM_Batch_Tensor_Input_with_Mask, create_ensemble_para, L2norm_paraList, Diversify_Reg, create_GRU_para, GRU_Batch_Tensor_Input_with_Mask, create_LSTM_para, load_word2vec
+from common_functions import store_model_to_file, load_model_from_file, GRU_TwoPiece_OneStep_MatrixInit_Tensor3Input, create_GRU_para_twoPiece, GRU_OneStep_MatrixInit_Tensor3Input, cosine_tensor3_tensor4, rmsprop, cosine_tensors, Adam, GRU_Batch_Tensor_Input_with_Mask_with_MatrixInit, Conv_with_input_para, LSTM_Batch_Tensor_Input_with_Mask, create_ensemble_para, L2norm_paraList, Diversify_Reg, create_GRU_para, GRU_Batch_Tensor_Input_with_Mask, create_LSTM_para, load_word2vec
 def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_performance=0.46, Div_reg=0.1, rel_emb_size=300, margin=0.3, ent_emb_size=300, batch_size=50, maxSentLen=5, neg_size=20):
     model_options = locals().copy()
     print "model options", model_options
@@ -76,7 +76,10 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_per
     #para
     U1, W1, b1=create_GRU_para(rng, rel_emb_size, ent_emb_size)
     NN_para=[U1, W1, b1]     #U1 includes 3 matrices, W1 also includes 3 matrices b1 is bias
-    U2, W2, b2=create_GRU_para(rng, rel_emb_size, ent_emb_size)
+#     U2, W2, b2=create_GRU_para(rng, rel_emb_size, ent_emb_size)
+#     NN_para2=[U2, W2, b2]     #U1 includes 3 matrices, W1 also includes 3 matrices b1 is bias
+
+    U2, W2, b2=create_GRU_para_twoPiece(rng, rel_emb_size, ent_emb_size)
     NN_para2=[U2, W2, b2]     #U1 includes 3 matrices, W1 also includes 3 matrices b1 is bias
     params= [rel_embeddings, ent_embeddings]+NN_para+NN_para2
 #     load_model_from_file(rootPath+'Best_Paras_arc2_task1_0.491428571429', params)
@@ -100,7 +103,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_per
 #     pred_ent_embs=gru_layer.output_tensor + init_heads_input.dimshuffle(0,1,'x')  # (batch_size, hidden_size, len)
 #     pred_last_ents=gru_layer.output_sent_rep + init_heads_input #(batch, hidden)
 
-    gru_layer2=GRU_OneStep_MatrixInit_Tensor3Input(gru_layer.output_tensor, init_heads_input, ent_emb_size, U2, W2, b2)   # (batch_size, hidden_size, len)
+    gru_layer2=GRU_TwoPiece_OneStep_MatrixInit_Tensor3Input(gru_layer.output_tensor, init_heads_input, ent_emb_size, U2, W2, b2)   # (batch_size, hidden_size, len)
     pred_ent_embs=gru_layer2.tensor3 #(batch, hidden, len)
     pred_last_ents=gru_layer2.tensor3[:,:,-1] #(batch, hidden)
 
@@ -262,7 +265,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=2000, L2_weight=0.00001, max_per
                 if hit10 > max_acc:
                     max_acc=hit10
                     if max_acc > max_performance:
-                        store_model_to_file(rootPath+'Best_Paras_arc2_task1_gru'+str(max_acc), params)
+                        store_model_to_file(rootPath+'Best_Paras_arc2_task1_gru_twopiece_'+str(max_acc), params)
                         print 'Finished storing best  params at:', max_acc  
                 print 'current hit10:', hit10, '\t\t\t\t\tmax hit10:', max_acc
                   
