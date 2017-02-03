@@ -566,6 +566,7 @@ def load_guu_data_4_CompTransE(maxPathLen=20):
             (test_paths_store, test_masks_store, test_ents_store)) , relation_id2wordlist,ent_str2id, relation_str2id, tuple2tailset, rel2tailset, ent2relset, ent2relset_maxSetSize, rel_id2inid
 
 
+
 if __name__ == '__main__':
 #     load_all_triples()
     recover_entities_for_guu_paths()

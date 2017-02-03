@@ -17,7 +17,7 @@ from random import shuffle
 from preprocess import rel_idmatrix_to_word2vec_init, rel_idlist_to_word2vec_init
 from preprocess_socher_guu import load_guu_data, load_all_triples_inIDs, neg_entity_tensor, load_guu_data_v2, neg_entity_tensor_v2
 from common_functions import store_model_to_file, cosine_matrix1_matrix2_rowwise, load_model_from_file, create_conv_para, cosine_tensor3_tensor4, rmsprop, cosine_tensors, Adam, GRU_Batch_Tensor_Input_with_Mask_with_MatrixInit, Conv_with_input_para, LSTM_Batch_Tensor_Input_with_Mask, create_ensemble_para, L2norm_paraList, Diversify_Reg, create_GRU_para, GRU_Batch_Tensor_Input_with_Mask, create_LSTM_para, load_word2vec
-def evaluate_lenet5(learning_rate=0.001, n_epochs=2000, L2_weight=0.00001, max_performance=0.45, Div_reg=0.1, rel_emb_size=300, margin=0.07, ent_emb_size=300, batch_size=20, maxSentLen=5, neg_size=10):
+def evaluate_lenet5(learning_rate=0.01, n_epochs=2000, L2_weight=0.00001, max_performance=0.45, Div_reg=0.1, rel_emb_size=300, margin=0.3, ent_emb_size=300, batch_size=50, maxSentLen=5, neg_size=20):
     model_options = locals().copy()
     print "model options", model_options
 
